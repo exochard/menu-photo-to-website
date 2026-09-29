@@ -6,7 +6,7 @@ OpenCV AI Competition 2026, Agentic Vision. Team exochard (Giuseppe Castelluccio
 - Live demo: https://rdnkmfzkqy6xfzvguayc3sneva0igvic.lambda-url.eu-central-1.on.aws/ (a
   synthetic menu and site are preloaded; "Upload your own" reads any photo)
 - Code: https://github.com/exochard/menu-photo-to-website
-- Video: https://vimeo.com/1231246365
+- Video and entry: https://devpost.com/software/menu-photo-to-website
 
 ## Problem and users
 
@@ -90,10 +90,11 @@ demo page shows that trace.
 - **Delivery:** `deploy.sh` creates or updates the repository, image, role, function and
   URL; `deploy.sh --down` removes them.
 
-Measured on the live URL, 2026-09-29, with the PP-OCRv5 reader: a plan takes 6.0 s end to
-end on a cold start and 2.8 s warm (two warm runs; levelling and growing the text boxes cost
-about a second); approval and rebuild take under 0.2 s. The CRNN version took 7.6 s cold and
-4.2 s warm.
+Measured on the live URL, 2026-09-29, after the last deploy: a warm plan takes 2.8 s end to
+end (two runs, 2.6 s of it inside the function). A cold start adds 0.5 s of start-up, and the
+first plan then takes 3.6 s while the models load; the first call right after a deploy took
+17 s while Lambda loaded the new image. Approval and rebuild take under 0.2 s. The CRNN
+version took 7.6 s cold and 4.2 s warm.
 
 ## Evaluation
 
