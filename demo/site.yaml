@@ -1,0 +1,37 @@
+site:
+  name: Ristorante Il Faro
+  tagline: Cucina di casa
+  lang: it
+  year: '2026'
+  noindex: true
+  skip_label: Vai al contenuto
+  theme_toggle_label: Cambia tema chiaro / scuro
+nav:
+- label: Menu
+  page: index
+pages:
+- slug: index
+  description: Il menu di oggi.
+  sections:
+  - type: menu
+    title: Il menu
+    groups:
+    - name: Dolci
+      items:
+      - name: Cannolo siciliano
+        price: 3,00 €
+      - name: Granita di mandorla
+        price: 4,00 €
+    - name: Secondi
+      items:
+      - name: Involtini alla messinese
+        price: 14,00 €
+      - name: Braciole di maiale
+        price: 11,00 €
+      - name: Piatto del giorno
+        price: 13,00 €
+  - type: hours
+    title: Orari
+    items:
+    - day: Tutti i giorni
+      time: 12:00-14:30, 19:30-23:00

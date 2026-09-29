@@ -1,0 +1,5 @@
+opencv-contrib-python-headless==5.0.0.93
+numpy==2.5.3
+pillow==12.3.0
+pytest==9.1.1
+PyYAML==6.0.3

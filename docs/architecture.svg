@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" font-family="Inter, system-ui, sans-serif">
+  <title>Menu photo to website: architecture</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#44403a"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#44403a;stroke-width:1.5}
+      .cv{fill:#e8f3f6;stroke:#0f6076;stroke-width:1.5}
+      .agent{fill:#f4efe4;stroke:#8a6d2e;stroke-width:1.5}
+      .human{fill:#eaf5ec;stroke:#1f7a3a;stroke-width:1.5}
+      .aws{fill:none;stroke:#c7700a;stroke-width:2;stroke-dasharray:8 5}
+      .t{font-size:15px;fill:#1d1b18;font-weight:600}
+      .s{font-size:12.5px;fill:#55504a}
+      .h{font-size:13px;fill:#c7700a;font-weight:700;letter-spacing:.04em}
+      .lbl{font-size:12px;fill:#8a2d0a;font-weight:600}
+      .edge{stroke:#44403a;stroke-width:1.5;fill:none;marker-end:url(#arrow)}
+      .warn{stroke:#b3261e;stroke-width:1.5;fill:none;marker-end:url(#arrow);stroke-dasharray:5 4}
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#faf8f4"/>
+
+  <!-- AWS boundary -->
+  <rect class="aws" x="170" y="20" width="1010" height="560" rx="14"/>
+  <text class="h" x="190" y="46">AWS · eu-central-1 · Lambda container (image in ECR) behind a Function URL</text>
+
+  <!-- owner -->
+  <rect class="human" x="12" y="120" width="146" height="90" rx="10"/>
+  <text class="t" x="85" y="155" text-anchor="middle">Owner</text>
+  <text class="s" x="85" y="175" text-anchor="middle">phone photo of</text>
+  <text class="s" x="85" y="191" text-anchor="middle">the printed menu</text>
+  <path class="edge" d="M158 165 H200"/>
+
+  <!-- OpenCV column -->
+  <rect class="cv" x="200" y="70" width="300" height="80" rx="10"/>
+  <text class="t" x="215" y="96">find_page · OpenCV 5</text>
+  <text class="s" x="215" y="116">Canny edges → convex hulls → largest</text>
+  <text class="s" x="215" y="133">four-corner hull → perspective warp</text>
+
+  <rect class="cv" x="200" y="190" width="300" height="100" rx="10"/>
+  <text class="t" x="215" y="216">read · OpenCV 5 dnn</text>
+  <text class="s" x="215" y="236">PP-OCRv3 DB text detection</text>
+  <text class="s" x="215" y="253">→ words split at ink gaps</text>
+  <text class="s" x="215" y="270">→ CRNN + CTC decode, confidence per word</text>
+
+  <rect class="cv" x="200" y="330" width="300" height="80" rx="10"/>
+  <text class="t" x="215" y="356">reread_region · OpenCV 5</text>
+  <text class="s" x="215" y="376">unsharp mask, read again, keep the</text>
+  <text class="s" x="215" y="393">likelier reading of each weak line</text>
+
+  <path class="edge" d="M350 150 V190"/>
+  <path class="warn" d="M500 250 C560 250 560 370 500 370"/>
+  <text class="lbl" x="560" y="300">line confidence</text>
+  <text class="lbl" x="560" y="316">&lt; 0.95</text>
+
+  <!-- retake -->
+  <path class="warn" d="M200 110 C120 110 110 300 150 330"/>
+  <rect class="human" x="20" y="330" width="130" height="70" rx="10"/>
+  <text class="t" x="85" y="360" text-anchor="middle">Retake</text>
+  <text class="s" x="85" y="380" text-anchor="middle">request, no edit</text>
+  <text class="lbl" x="40" y="250">no page</text>
+
+  <!-- agent column -->
+  <rect class="agent" x="640" y="70" width="250" height="80" rx="10"/>
+  <text class="t" x="655" y="96">parse</text>
+  <text class="s" x="655" y="116">items, prices, sections,</text>
+  <text class="s" x="655" y="133">opening hours</text>
+  <path class="edge" d="M500 400 C580 420 600 160 640 115"/>
+
+  <rect class="agent" x="640" y="190" width="250" height="100" rx="10"/>
+  <text class="t" x="655" y="216">diff_against_site</text>
+  <text class="s" x="655" y="236">name match without accents,</text>
+  <text class="s" x="655" y="253">price and hours compare with the</text>
+  <text class="s" x="655" y="270">site's menu and hours sections</text>
+  <path class="edge" d="M765 150 V190"/>
+
+  <rect class="box" x="940" y="190" width="220" height="100" rx="10"/>
+  <text class="t" x="955" y="216">site.yaml</text>
+  <text class="s" x="955" y="236">per-client config, sent</text>
+  <text class="s" x="955" y="253">with each request; nothing</text>
+  <text class="s" x="955" y="270">uploaded is stored</text>
+  <path class="edge" d="M940 240 H890"/>
+
+  <rect class="agent" x="640" y="330" width="250" height="110" rx="10"/>
+  <text class="t" x="655" y="356">Plan</text>
+  <text class="s" x="655" y="376">confidence ≥ 0.95 → proposal</text>
+  <text class="s" x="655" y="393">confidence &lt; 0.95 → question</text>
+  <text class="s" x="655" y="410">missing item, changed hours</text>
+  <text class="s" x="655" y="427">→ always a question</text>
+  <path class="edge" d="M765 290 V330"/>
+
+  <rect class="box" x="940" y="360" width="220" height="80" rx="10"/>
+  <text class="t" x="955" y="386">CloudWatch Logs</text>
+  <text class="s" x="955" y="406">one JSON trace per run:</text>
+  <text class="s" x="955" y="423">tools, counts, timings</text>
+  <path class="edge" d="M890 400 H940"/>
+
+  <rect class="box" x="640" y="480" width="250" height="80" rx="10"/>
+  <text class="t" x="655" y="506">apply_approved → build</text>
+  <text class="s" x="655" y="526">writes approved changes only,</text>
+  <text class="s" x="655" y="543">rebuilds the static site</text>
+
+  <!-- human approval outside -->
+  <rect class="human" x="400" y="620" width="340" height="90" rx="10"/>
+  <text class="t" x="570" y="652" text-anchor="middle">Owner reviews in the browser</text>
+  <text class="s" x="570" y="672" text-anchor="middle">ticks each proposal, answers the questions;</text>
+  <text class="s" x="570" y="689" text-anchor="middle">nothing is written without approval</text>
+  <path class="edge" d="M640 420 C560 440 560 560 570 620"/>
+  <path class="edge" d="M740 665 C790 665 790 600 765 560"/>
+
+  <rect class="box" x="940" y="620" width="220" height="90" rx="10"/>
+  <text class="t" x="955" y="652">Updated website</text>
+  <text class="s" x="955" y="672">new prices live; old config</text>
+  <text class="s" x="955" y="689">kept as site.yaml.bak</text>
+  <path class="edge" d="M890 540 C930 560 960 590 990 620"/>
+</svg>

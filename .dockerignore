@@ -1,0 +1,10 @@
+*
+!requirements.txt
+!models
+!menuvision
+!demo/menu.jpg
+!demo/site.yaml
+!web
+!webapp.py
+!sitebuilder
+**/__pycache__

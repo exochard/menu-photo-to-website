@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu photo to website</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d1b18;--muted:#6b665d;--line:#e2ddd3;--accent:#0f6076;--warn:#9a5b00;--ok:#1f7a3a}
+@media (prefers-color-scheme:dark){:root{--bg:#141412;--card:#1e1d1a;--ink:#ece8e0;--muted:#a39d92;--line:#34312b;--accent:#7cc6dd;--warn:#f0b35a;--ok:#6fd08c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:1.6rem;margin:0 0 4px}
+.lede{color:var(--muted);margin:0 0 24px;max-width:60ch}
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:860px){.grid{grid-template-columns:1fr 1fr}}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+h2{font-size:1.05rem;margin:0 0 12px}
+.step{color:var(--muted);font-weight:600;margin-right:6px}
+img.photo{width:100%;max-height:420px;object-fit:contain;background:var(--bg);border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button,label.btn{font:inherit;border:1px solid var(--accent);background:var(--accent);color:var(--card);padding:8px 14px;border-radius:6px;cursor:pointer}
+button.ghost,label.btn{background:transparent;color:var(--accent)}
+button:disabled{opacity:.5;cursor:wait}
+input[type=file]{display:none}
+ol.trace{margin:0;padding-left:20px;font:13px/1.6 ui-monospace,monospace;color:var(--muted)}
+ul.plain{list-style:none;margin:0;padding:0}
+.change{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.q{padding:8px 0;border-bottom:1px solid var(--line);color:var(--warn)}
+.conf{color:var(--muted);font-size:.85rem}
+.status{font-weight:600}
+.empty{color:var(--muted)}
+iframe{width:100%;height:560px;border:1px solid var(--line);border-radius:6px;background:#fff}
+details{margin-top:12px}
+textarea{width:100%;min-height:220px;font:13px ui-monospace,monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px}
+.err{color:#c0392b}
+</style>
+</head>
+<body>
+<main>
+  <h1>Menu photo to website</h1>
+  <p class="lede">A restaurant owner photographs the printed menu. OpenCV finds the page and reads it,
+  the agent compares it with the website and proposes changes. Nothing changes on the site until the
+  owner approves each one.</p>
+
+  <div class="grid">
+    <section>
+      <h2><span class="step">1</span>Photo</h2>
+      <img class="photo" id="preview" src="demo.jpg" alt="The menu photo being read">
+      <div class="row">
+        <button id="run">Read this photo</button>
+        <label class="btn">Upload your own<input type="file" id="file" accept="image/jpeg,image/png"></label>
+      </div>
+      <details>
+        <summary>Website config (site.yaml)</summary>
+        <textarea id="config" spellcheck="false" aria-label="Website config"></textarea>
+      </details>
+    </section>
+
+    <section>
+      <h2><span class="step">2</span>What the agent did</h2>
+      <p class="status" id="status" aria-live="polite">Not run yet.</p>
+      <ol class="trace" id="trace"></ol>
+      <h2 style="margin-top:16px">Proposed changes</h2>
+      <ul class="plain" id="proposals"><li class="empty">None yet.</li></ul>
+      <h2 style="margin-top:16px">Questions for the owner</h2>
+      <ul class="plain" id="questions"><li class="empty">None yet.</li></ul>
+      <div class="row"><button id="apply" disabled>Apply the approved changes</button></div>
+    </section>
+  </div>
+
+  <section style="margin-top:16px">
+    <h2><span class="step">3</span>The rebuilt page</h2>
+    <p class="empty" id="builtNote">Appears after you approve changes.</p>
+    <iframe id="site" title="Rebuilt website preview" sandbox hidden></iframe>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let photo = null;  // base64 of an uploaded photo; null means the demo photo
+let lastPlan = null;
+
+fetch("site.yaml").then((r) => r.text()).then((t) => { $("config").value = t; });
+async function post(path, body) {
+  const res = await fetch(path, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(body)});
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+function text(el, value) { el.textContent = value; return el; }
+function config() { return $("config").value.trim() ? $("config").value : null; }
+
+$("file").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => { $("preview").src = reader.result; photo = reader.result.split(",")[1]; };
+  reader.readAsDataURL(f);
+});
+
+$("run").addEventListener("click", async () => {
+  $("run").disabled = true; $("apply").disabled = true;
+  text($("status"), "Reading the photo…"); $("trace").replaceChildren();
+  try {
+    const plan = await post("plan", {photo, config: config()});
+    lastPlan = plan;
+    text($("status"), `${plan.status.replace("_", " ")} · ${plan.seconds}s`);
+    $("trace").replaceChildren(...plan.trace.map((s) => {
+      const {tool, ...rest} = s; return text(document.createElement("li"), `${tool} ${JSON.stringify(rest)}`);
+    }));
+    const props = plan.proposals.map((c, i) => {
+      const li = document.createElement("li"); li.className = "change";
+      const box = document.createElement("input"); box.type = "checkbox"; box.checked = true; box.id = `c${i}`; box.dataset.i = i;
+      const label = document.createElement("label"); label.htmlFor = box.id;
+      label.append(c.kind === "price" ? `${c.name}: ${c.old} → ${c.new} €` : `New in "${c.group}": ${c.name} ${c.new} €`);
+      label.append(document.createElement("br"), text(document.createElement("span"), `confidence ${c.confidence.toFixed(2)}`));
+      label.lastChild.className = "conf";
+      li.append(box, label); return li;
+    });
+    $("proposals").replaceChildren(...(props.length ? props : [text(document.createElement("li"), "No changes to propose.")]));
+    const qs = plan.questions.map((q) => { const li = text(document.createElement("li"), q); li.className = "q"; return li; });
+    $("questions").replaceChildren(...(qs.length ? qs : [text(document.createElement("li"), "None.")]));
+    $("apply").disabled = !plan.proposals.length;
+  } catch (err) {
+    text($("status"), err.message).className = "status err";
+  } finally { $("run").disabled = false; }
+});
+
+$("apply").addEventListener("click", async () => {
+  const approved = [...document.querySelectorAll("#proposals input:checked")].map((b) => lastPlan.proposals[b.dataset.i]);
+  $("apply").disabled = true;
+  try {
+    const out = await post("apply", {config: config(), approved});
+    $("config").value = out.config;
+    $("site").srcdoc = out.page; $("site").hidden = false;
+    text($("builtNote"), `${approved.length} change(s) applied. The config below step 1 now holds the new version.`);
+  } catch (err) {
+    text($("builtNote"), err.message).className = "err";
+  } finally { $("apply").disabled = false; }
+});
+</script>
+</body>
+</html>

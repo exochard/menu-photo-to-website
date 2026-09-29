@@ -1,0 +1,183 @@
+/* Static-site base theme.
+   Neutral on purpose: this is the CLIENT's site, not the studio's brand.
+   Per-client colour/type overrides arrive as CSS vars from site.yaml `theme:`.
+   Light and dark are both first-class — never fight the browser's preference. */
+
+:root{
+  --accent:#1f6f8b;
+  --accent-dark:#7fc3dd;          /* accent used when the page is dark */
+  --radius:10px;
+  --maxw:1080px;
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-display:var(--font-body);
+
+  --paper:#ffffff;
+  --paper-2:#f4f6f8;
+  --card:#ffffff;
+  --ink:#141a1f;
+  --ink-soft:#5a6672;
+  --line:#dde3e9;
+  --shadow:0 1px 2px rgba(16,24,32,.06),0 6px 20px rgba(16,24,32,.06);
+  --on-accent:#ffffff;
+  color-scheme:light dark;
+}
+
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0f1418; --paper-2:#151c22; --card:#161e25;
+    --ink:#e7edf2; --ink-soft:#9aa8b4; --line:#28323b;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+    --accent:var(--accent-dark); --on-accent:#0b1014;
+  }
+}
+/* Explicit toggle wins over the OS preference, in both directions. */
+:root[data-theme="light"]{
+  --paper:#ffffff; --paper-2:#f4f6f8; --card:#ffffff;
+  --ink:#141a1f; --ink-soft:#5a6672; --line:#dde3e9;
+  --shadow:0 1px 2px rgba(16,24,32,.06),0 6px 20px rgba(16,24,32,.06);
+  --on-accent:#ffffff; color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --paper:#0f1418; --paper-2:#151c22; --card:#161e25;
+  --ink:#e7edf2; --ink-soft:#9aa8b4; --line:#28323b;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+  --accent:var(--accent-dark); --on-accent:#0b1014; color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font:16px/1.6 var(--font-body);-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--font-display);line-height:1.15;margin:0 0 .5em;letter-spacing:-.015em}
+h1{font-size:clamp(2rem,5.2vw,3.25rem)}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem)}
+h3{font-size:1.15rem}
+p{margin:0 0 1rem}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.plain{list-style:none;margin:0;padding:0}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+.section{padding:64px 0;border-top:1px solid var(--line)}
+.section__intro{color:var(--ink-soft);max-width:62ch;margin:-.25rem 0 2rem}
+
+.skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:var(--on-accent);padding:10px 16px;z-index:99}
+.skip:focus{left:0}
+.preview-notice{margin:0;padding:10px 16px;text-align:center;font-size:.95rem;background:var(--accent);color:var(--on-accent)}
+
+/* header */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar__in{display:flex;align-items:center;gap:16px;min-height:60px;flex-wrap:wrap}
+.brand{font-family:var(--font-display);font-weight:700;font-size:1.1rem;text-decoration:none;color:var(--ink)}
+.nav{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+.nav a{color:var(--ink-soft);text-decoration:none;font-size:.95rem}
+.nav a:hover,.nav a[aria-current]{color:var(--accent)}
+.themetoggle{background:none;border:1px solid var(--line);color:var(--ink-soft);
+  border-radius:var(--radius);width:34px;height:34px;cursor:pointer;font-size:15px;line-height:1}
+.themetoggle:hover{color:var(--accent);border-color:var(--accent)}
+
+/* hero */
+.hero{padding:76px 0 60px;background:var(--paper-2)}
+.hero__in{display:grid;gap:36px}
+.hero--split .hero__in{grid-template-columns:1.05fr .95fr;align-items:center}
+/* Signature: a short accent rule that leads the kicker and reappears as the quote
+   border and the tick marks — one motif, three places, no extra ornament. */
+.kicker{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;color:var(--accent);
+  margin:0 0 .9rem;font-weight:600;display:flex;align-items:center;gap:.7em}
+.kicker::before{content:"";width:34px;height:2px;background:var(--accent);flex:none}
+.hero__sub{font-size:1.12rem;color:var(--ink-soft);max-width:56ch}
+.hero__media img{border-radius:var(--radius);box-shadow:var(--shadow)}
+
+/* buttons */
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:1.4rem}
+.btn{display:inline-block;background:var(--accent);color:var(--on-accent);text-decoration:none;
+  padding:12px 22px;border-radius:var(--radius);font-weight:600;border:1px solid var(--accent)}
+.btn:hover{filter:brightness(1.08)}
+.btn--ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+.btn--ghost:hover{border-color:var(--accent)}
+
+/* grids & cards */
+.grid{display:grid;gap:20px}
+.grid--3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px;box-shadow:var(--shadow)}
+.card h3{margin-bottom:.4rem}
+.card p{color:var(--ink-soft);margin:0}
+.card__icon{font-size:1.6rem;display:block;margin-bottom:.6rem}
+.card--service .price{font-family:var(--font-display);font-size:1.5rem;color:var(--accent);
+  font-weight:700;margin:0 0 .6rem}
+.ticks{list-style:none;padding:0;margin:1rem 0 0;color:var(--ink-soft);font-size:.95rem}
+.ticks li{padding-left:1.35em;position:relative;margin-bottom:.35rem}
+.ticks li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+
+/* about */
+.about__in{display:grid;gap:36px}
+.about__in--split{grid-template-columns:1fr 1fr;align-items:center}
+.about__media img{border-radius:var(--radius);box-shadow:var(--shadow)}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.gallery img{border-radius:var(--radius);aspect-ratio:4/3;object-fit:cover;width:100%}
+
+/* quotes */
+.quote{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:var(--radius);padding:22px}
+.quote blockquote{margin:0 0 .8rem;font-size:1.02rem}
+.quote__by{margin:0;color:var(--ink-soft);font-size:.9rem}
+
+/* hours */
+.hours{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.hours__table{width:100%;border-collapse:collapse}
+.hours__table th,.hours__table td{text-align:left;padding:11px 0;border-bottom:1px solid var(--line);font-weight:400}
+.hours__table th{color:var(--ink-soft)}
+.hours__where h3{margin-bottom:.5rem}
+
+/* faq */
+.faq__item{border-bottom:1px solid var(--line);padding:16px 0}
+.faq__item summary{cursor:pointer;font-weight:600;list-style:none}
+.faq__item summary::-webkit-details-marker{display:none}
+.faq__item summary::before{content:"+";color:var(--accent);font-weight:700;margin-right:.6em}
+.faq__item[open] summary::before{content:"–"}
+.faq__a{padding-top:.7rem;color:var(--ink-soft)}
+
+/* cta */
+.cta{background:var(--accent);color:var(--on-accent);padding:52px 0}
+.cta h2,.cta p{color:var(--on-accent);margin:0}
+.cta p{opacity:.9;margin-top:.5rem}
+.cta__in{display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cta .btn{background:var(--on-accent);color:var(--accent);border-color:var(--on-accent)}
+.cta .btnrow{margin-top:0}
+
+/* footer */
+.foot{border-top:1px solid var(--line);background:var(--paper-2);padding:34px 0;font-size:.92rem;color:var(--ink-soft)}
+.foot p{margin:0 0 .4rem}
+.foot__social{display:flex;gap:14px;flex-wrap:wrap}
+.foot__legal{opacity:.75}
+
+@media (max-width:860px){
+  .grid--3,.gallery{grid-template-columns:repeat(2,1fr)}
+  .hero--split .hero__in,.about__in--split,.hours{grid-template-columns:1fr}
+  .section{padding:48px 0}
+}
+@media (max-width:560px){
+  .grid--3,.gallery{grid-template-columns:1fr}
+  .nav{gap:12px;font-size:.9rem}
+  .hero{padding:52px 0 44px}
+}
+
+@media print{
+  .bar,.themetoggle,.skip,.cta .btnrow{display:none}
+  body{background:#fff;color:#000}
+}
+
+/* menu: printed-menu rows, name left and price right */
+.menu{display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))}
+.menu__item{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;
+  border-bottom:1px dotted color-mix(in srgb,currentColor 30%,transparent)}
+.menu__price{font-variant-numeric:tabular-nums;white-space:nowrap}
