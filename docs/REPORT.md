@@ -1,9 +1,12 @@
 # Menu photo to website: technical report
 
-OpenCV AI Competition 2026, Agentic Vision. Draft of 2026-09-29; every number below comes
-from a script in this repository and says which one. Live demo:
-https://rdnkmfzkqy6xfzvguayc3sneva0igvic.lambda-url.eu-central-1.on.aws/ (a synthetic menu
-and site are preloaded; "Upload your own" reads any photo).
+OpenCV AI Competition 2026, Agentic Vision. Team exochard (Giuseppe Castelluccio), report of
+2026-09-29. Every number below comes from a script in this repository and says which one.
+
+- Live demo: https://rdnkmfzkqy6xfzvguayc3sneva0igvic.lambda-url.eu-central-1.on.aws/ (a
+  synthetic menu and site are preloaded; "Upload your own" reads any photo)
+- Code: https://github.com/exochard/menu-photo-to-website
+- Video: https://vimeo.com/1231246365
 
 ## Problem and users
 
