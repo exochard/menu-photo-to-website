@@ -1,7 +1,10 @@
 import base64
 import json
 
+import pytest
+
 import webapp
+from menuvision.ocr import RECOGNIZER
 
 
 def call(method, path, body=None):
@@ -18,6 +21,7 @@ def test_page_and_demo_assets_are_served():
     assert status == 200 and out["isBase64Encoded"] and base64.b64decode(out["body"])[:2] == b"\xff\xd8"
 
 
+@pytest.mark.skipif(not RECOGNIZER.exists(), reason="models not downloaded (./fetch_models.sh)")
 def test_demo_plan_then_apply_rebuilds_the_page_with_escaped_text():
     status, out = call("POST", "/plan", {})
     plan = json.loads(out["body"])

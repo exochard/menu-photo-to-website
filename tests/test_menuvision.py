@@ -4,7 +4,7 @@ import cv2 as cv
 import numpy as np
 import pytest
 
-from menuvision.ocr import CHARSET, RECOGNIZER, Reader, ctc_decode, split_words
+from menuvision.ocr import CHARSET, RECOGNIZER, Reader, Word, ctc_decode, group_lines, text_slope
 from menuvision.page import find_page
 from menuvision.parse import parse
 from menuvision.synth import photograph, random_menu, render, sample
@@ -14,7 +14,7 @@ def one_hot(indices: list[int]) -> np.ndarray:
     probs = np.full((len(indices), len(CHARSET) + 1), 0.001, np.float32)
     for t, i in enumerate(indices):
         probs[t, i] = 0.9
-    return np.log(probs)  # the CRNN emits log-probabilities
+    return np.log(probs)  # the decoder takes log-probabilities
 
 
 def test_ctc_keeps_real_hyphens_and_collapses_repeats():
@@ -31,10 +31,27 @@ def test_ctc_blank_separates_double_letters():
     assert ctc_decode(one_hot([l, l]))[0] == "l"
 
 
-def test_split_words_on_rendered_line():
-    line = np.full((50, 400), 255, np.uint8)
-    cv.putText(line, "Pasta   alla   Norma", (5, 38), cv.FONT_HERSHEY_SIMPLEX, 1.1, 0, 2)
-    assert len(split_words(line)) == 3
+def test_ctc_reads_italian_accents_and_the_euro_sign():
+    text = "ragù lunedì 9,50 €"
+    assert ctc_decode(one_hot([CHARSET.index(c) + 1 for c in text]))[0] == text
+
+
+def test_rows_join_a_lower_price_but_not_the_next_dish():
+    name, price, below = Word(100, 400, "Cassata", 0.99), Word(800, 900, "6,00 €", 0.99), \
+        Word(100, 400, "Cannolo", 0.99)
+    # The price box sits 15 px lower than its 40 px dish name; the next dish is 58 px down.
+    lines = group_lines([(100, 140, name), (115, 155, price), (158, 198, below)])
+    assert [line.text for line in lines] == ["Cassata 6,00 €", "Cannolo"]
+
+
+def test_text_slope_is_the_median_of_long_boxes():
+    def box(cx, cy, slope):
+        dx = np.float32([150, 150 * slope])
+        dy = np.float32([-20 * slope, 20])
+        c = np.float32([cx, cy])
+        return np.array([c - dx - dy, c + dx - dy, c + dx + dy, c - dx + dy], np.float32)
+    boxes = [box(300, 100 + 60 * i, 0.05) for i in range(5)] + [box(300, 500, 0.0)]
+    assert abs(text_slope(boxes) - 0.05) < 0.005
 
 
 def test_parse_prices_hours_and_sections():
@@ -71,10 +88,10 @@ def test_find_page_reports_a_missing_page():
 
 
 @pytest.mark.skipif(not RECOGNIZER.exists(), reason="models not downloaded (./fetch_models.sh)")
-def test_end_to_end_reads_prices_and_hours():
+def test_end_to_end_reads_names_with_accents_prices_and_hours():
     s = sample(7, tilt=0.06, blur=0.8)
     menu = parse([line.text for line in Reader().read(find_page(s.photo).image)])
     assert menu.hours == s.truth.hours
-    want = [i.price for sec in s.truth.sections for i in sec.items]
-    got = [i.price for sec in menu.sections for i in sec.items]
-    assert sum(p in got for p in want) >= len(want) - 1
+    want = [(i.name, i.price) for sec in s.truth.sections for i in sec.items]
+    got = [(i.name, i.price) for sec in menu.sections for i in sec.items]
+    assert sum(item in got for item in want) >= len(want) - 1

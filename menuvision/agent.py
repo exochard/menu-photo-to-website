@@ -30,8 +30,9 @@ from menuvision.page import find_page
 from menuvision.parse import PRICE, TIME_RANGE, parse
 
 # Line confidence below this triggers a re-read, and a change read below it is a question.
-# On tuning seeds 0-39 it flags 55% of misread item lines and 13% of correct ones.
-LOW = 0.95
+# On tuning seeds 0-39 of the six conditions it flags 23% of misread item lines and 6% of
+# correct ones, with no wrong proposal; 0.90 also gave none but flagged 9% of misreads.
+LOW = 0.93
 _HERE = Path(__file__).resolve().parents[1]
 BUILD = next(p for p in (_HERE / "sitebuilder/build.py",
                          _HERE.parents[1] / "products/static-site/template/build.py") if p.exists())
@@ -147,6 +148,16 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
                                  "with the whole sheet in the frame on a darker surface.")
         return outcome
     lines = reader.read(page.image)
+    # Text running into the left or right edge of the flattened page means the outline cut
+    # through the menu (a page partly outside the photo); names read there are fragments.
+    width = page.image.shape[1]
+    cut = sum(line.words[0].x0 <= 1 or line.words[-1].x1 >= width - 1 for line in lines)
+    if cut >= 2:
+        trace.append({"tool": "read", "lines": len(lines), "cut_at_edge": cut})
+        outcome.status = "retake"
+        outcome.questions.append("Part of the menu is outside the photo or hidden. Please take it again "
+                                 "with the whole sheet in the frame.")
+        return outcome
     weak = sum(line.confidence < low for line in lines)
     trace.append({"tool": "read", "lines": len(lines), "low_confidence": weak})
     if weak:

@@ -1,0 +1,50 @@
+{
+ "tilt=0.04,blur=0.6": {
+  "photos": 30,
+  "page_found": "30/30",
+  "cer_mean": 0.068,
+  "items_exact": "128/199",
+  "hours_exact": "30/30",
+  "seconds_per_photo": 0.99
+ },
+ "tilt=0.08,blur=1.0": {
+  "photos": 30,
+  "page_found": "30/30",
+  "cer_mean": 0.081,
+  "items_exact": "117/199",
+  "hours_exact": "28/30",
+  "seconds_per_photo": 1.05
+ },
+ "tilt=0.12,blur=1.6": {
+  "photos": 30,
+  "page_found": "29/30",
+  "cer_mean": 0.165,
+  "items_exact": "58/199",
+  "hours_exact": "21/30",
+  "seconds_per_photo": 0.87
+ },
+ "tilt=0.16,blur=2.2": {
+  "photos": 30,
+  "page_found": "26/30",
+  "cer_mean": 0.394,
+  "items_exact": "6/199",
+  "hours_exact": "7/30",
+  "seconds_per_photo": 0.66
+ },
+ "tilt=0.1,blur=1.2,phone": {
+  "photos": 30,
+  "page_found": "30/30",
+  "cer_mean": 0.119,
+  "items_exact": "89/199",
+  "hours_exact": "22/30",
+  "seconds_per_photo": 0.91
+ },
+ "tilt=0.16,blur=1.8,phone": {
+  "photos": 30,
+  "page_found": "26/30",
+  "cer_mean": 0.32,
+  "items_exact": "18/199",
+  "hours_exact": "12/30",
+  "seconds_per_photo": 0.77
+ }
+}

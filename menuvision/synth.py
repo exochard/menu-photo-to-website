@@ -18,14 +18,14 @@ FONTS = ["/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
          "/usr/share/fonts/TTF/DejaVuSans.ttf"]
 TITLES = ["Trattoria da Nino", "Osteria del Porto", "Ristorante Il Faro", "Pizzeria Etna", "Bar Centrale"]
 DISHES = {
-    "Antipasti": ["Caponata", "Bruschetta al pomodoro", "Arancine al ragu", "Tagliere di salumi", "Parmigiana"],
-    "Primi": ["Pasta alla Norma", "Spaghetti alle vongole", "Maccheroni al ragu di maiale",
+    "Antipasti": ["Caponata", "Bruschetta al pomodoro", "Arancine al ragù", "Tagliere di salumi", "Parmigiana"],
+    "Primi": ["Pasta alla Norma", "Spaghetti alle vongole", "Maccheroni al ragù di maiale",
               "Pasta con le sarde", "Risotto ai funghi porcini", "Linguine al nero di seppia"],
     "Secondi": ["Involtini alla messinese", "Pesce spada alla griglia", "Salsiccia al finocchietto",
                 "Frittura di calamari", "Braciole di maiale"],
-    "Dolci": ["Cannolo siciliano", "Cassata", "Granita di mandorla", "Tiramisu della casa"],
+    "Dolci": ["Cannolo siciliano", "Cassata", "Granita di mandorla", "Tiramisù della casa", "Babà al rum"],
 }
-CLOSING = ["Chiuso il lunedi", "Chiuso la domenica sera", "Chiuso il martedi"]
+CLOSING = ["Chiuso il lunedì", "Chiuso la domenica sera", "Chiuso il martedì"]
 
 
 @dataclass
@@ -78,8 +78,13 @@ def render(menu: Menu, rng: random.Random) -> np.ndarray:
     return cv.cvtColor(np.array(page), cv.COLOR_RGB2BGR)
 
 
-def photograph(page: np.ndarray, rng: random.Random, tilt: float = 0.08, blur: float = 1.0) -> np.ndarray:
-    """Place the page on a table at an angle, with uneven light, blur and sensor noise."""
+def photograph(page: np.ndarray, rng: random.Random, tilt: float = 0.08, blur: float = 1.0,
+               phone: bool = False) -> np.ndarray:
+    """Place the page on a table at an angle, with uneven light, blur and sensor noise.
+
+    `phone` adds what a quick phone shot brings: a hand's soft shadow across part of the
+    page, a glare spot from a ceiling light, and JPEG compression.
+    """
     H, W = 1500, 2000
     np_rng = np.random.default_rng(rng.randint(0, 2**31))
     table = cv.GaussianBlur(np_rng.integers(50, 120, (H, W, 3), dtype=np.uint8), (0, 0), 6)
@@ -95,12 +100,24 @@ def photograph(page: np.ndarray, rng: random.Random, tilt: float = 0.08, blur: f
     shot = np.where(mask[..., None] > 0, warped, table).astype(np.float32)
     light = np.linspace(rng.uniform(0.7, 0.9), rng.uniform(1.0, 1.1), W, dtype=np.float32)
     shot *= (light if rng.random() < 0.5 else light[::-1])[None, :, None]
+    if phone:
+        yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+        # A soft diagonal shadow over one side of the page, 25-45% darker.
+        side = np.clip((xx * rng.uniform(0.5, 1.5) + yy - rng.uniform(0.9, 1.4) * W) / 250, 0, 1)
+        shot *= (1 - rng.uniform(0.25, 0.45) * side)[..., None]
+        # A glare spot: light added, washing the ink out towards white.
+        gx, gy, gr = cx + rng.uniform(-0.3, 0.3) * pw, cy + rng.uniform(-0.3, 0.3) * ph, rng.uniform(90, 160)
+        shot += (rng.uniform(90, 150) * np.exp(-((xx - gx) ** 2 + (yy - gy) ** 2) / (2 * gr ** 2)))[..., None]
     shot += np_rng.normal(0, 4, shot.shape)
     shot = np.clip(shot, 0, 255).astype(np.uint8)
-    return cv.GaussianBlur(shot, (0, 0), blur) if blur > 0 else shot
+    shot = cv.GaussianBlur(shot, (0, 0), blur) if blur > 0 else shot
+    if phone:
+        quality = rng.randint(55, 75)
+        shot = cv.imdecode(cv.imencode(".jpg", shot, [cv.IMWRITE_JPEG_QUALITY, quality])[1], cv.IMREAD_COLOR)
+    return shot
 
 
-def sample(seed: int, tilt: float = 0.08, blur: float = 1.0) -> Sample:
+def sample(seed: int, tilt: float = 0.08, blur: float = 1.0, phone: bool = False) -> Sample:
     rng = random.Random(seed)
     menu, lines = random_menu(rng)
-    return Sample(photograph(render(menu, rng), rng, tilt, blur), menu, lines)
+    return Sample(photograph(render(menu, rng), rng, tilt, blur, phone), menu, lines)

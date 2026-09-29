@@ -1,0 +1,11 @@
+Third-party material in this repository
+
+menuvision/latin_dict.txt is the character dictionary of PaddlePaddle's
+latin_PP-OCRv5_mobile_rec model (https://huggingface.co/PaddlePaddle/latin_PP-OCRv5_mobile_rec_onnx,
+revision 89d3a50e2c27e2e7cceeab0e944c25c807d5db4f), copied from its inference.yml.
+Copyright PaddlePaddle Authors, licensed under the Apache License, Version 2.0
+(https://www.apache.org/licenses/LICENSE-2.0).
+
+The model files that fetch_models.sh downloads are not part of this repository:
+- text_detection_en_ppocrv3_2023may.onnx, OpenCV Model Zoo, Apache-2.0
+- latin_PP-OCRv5_mobile_rec.onnx, PaddlePaddle, Apache-2.0

@@ -1,0 +1,56 @@
+{
+ "tilt=0.04,blur=0.6": {
+  "photos": 30,
+  "price_changes_proposed": "56/60",
+  "wrong_proposals": 0,
+  "asked_about_extra_item": "30/30",
+  "questions_per_photo": 1.37,
+  "retake_requests": 0,
+  "photos_reread": 27
+ },
+ "tilt=0.08,blur=1.0": {
+  "photos": 30,
+  "price_changes_proposed": "53/60",
+  "wrong_proposals": 0,
+  "asked_about_extra_item": "30/30",
+  "questions_per_photo": 1.63,
+  "retake_requests": 0,
+  "photos_reread": 26
+ },
+ "tilt=0.12,blur=1.6": {
+  "photos": 30,
+  "price_changes_proposed": "34/60",
+  "wrong_proposals": 0,
+  "asked_about_extra_item": "28/30",
+  "questions_per_photo": 3.4,
+  "retake_requests": 2,
+  "photos_reread": 24
+ },
+ "tilt=0.16,blur=2.2": {
+  "photos": 30,
+  "price_changes_proposed": "13/60",
+  "wrong_proposals": 4,
+  "asked_about_extra_item": "23/30",
+  "questions_per_photo": 4.97,
+  "retake_requests": 7,
+  "photos_reread": 26
+ },
+ "tilt=0.1,blur=1.2,phone": {
+  "photos": 30,
+  "price_changes_proposed": "37/60",
+  "wrong_proposals": 1,
+  "asked_about_extra_item": "30/30",
+  "questions_per_photo": 2.73,
+  "retake_requests": 0,
+  "photos_reread": 29
+ },
+ "tilt=0.16,blur=1.8,phone": {
+  "photos": 30,
+  "price_changes_proposed": "16/60",
+  "wrong_proposals": 6,
+  "asked_about_extra_item": "23/30",
+  "questions_per_photo": 3.83,
+  "retake_requests": 7,
+  "photos_reread": 26
+ }
+}

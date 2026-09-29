@@ -16,7 +16,9 @@ from menuvision.page import find_page
 from menuvision.parse import parse
 from menuvision.synth import sample
 
-CONDITIONS = [(0.04, 0.6), (0.08, 1.0), (0.12, 1.6)]
+# (tilt, blur, phone): phone adds a hand's shadow, a glare spot and JPEG compression.
+CONDITIONS = [(0.04, 0.6, False), (0.08, 1.0, False), (0.12, 1.6, False),
+              (0.16, 2.2, False), (0.10, 1.2, True), (0.16, 1.8, True)]
 # Parameters were tuned on seeds 0-99; the evaluation never uses those.
 EVAL_SEED = 1000
 
@@ -42,10 +44,10 @@ def main() -> None:
     args = ap.parse_args()
     reader = Reader()
     report = {}
-    for tilt, blur in CONDITIONS:
+    for tilt, blur, phone in CONDITIONS:
         found, cers, items_ok, items_all, hours_ok, secs = 0, [], 0, 0, 0, []
         for seed in range(EVAL_SEED, EVAL_SEED + args.n):
-            s = sample(seed, tilt, blur)
+            s = sample(seed, tilt, blur, phone)
             t = time.perf_counter()
             page = find_page(s.photo)
             lines = [line.text for line in reader.read(page.image)]
@@ -58,7 +60,7 @@ def main() -> None:
             items_ok += sum(w in got for w in want)
             items_all += len(want)
             hours_ok += menu.hours == s.truth.hours
-        key = f"tilt={tilt},blur={blur}"
+        key = f"tilt={tilt},blur={blur}" + (",phone" if phone else "")
         report[key] = {
             "photos": args.n,
             "page_found": f"{found}/{args.n}",

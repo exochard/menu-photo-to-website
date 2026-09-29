@@ -2,8 +2,8 @@
 import re
 from dataclasses import dataclass, field
 
-# A price at the end of a line, optionally followed by the euro sign. The CRNN charset has
-# no "€", so the sign comes back as a stray "6", "C", "E" or "e" token after the price.
+# A price at the end of a line, optionally followed by the euro sign. Under heavy blur the
+# sign can still come back as a stray "6", "C", "E" or "e" after the price.
 PRICE = re.compile(r"^(?P<name>.*?)\s*(?:€\s*)?(?P<price>\d{1,3}[.,]\d{2})(?:\s*(?:€|[6CEce]))?$")
 TIME_RANGE = re.compile(r"(\d{1,2})[:.](\d{2})\s*[-–]?\s*(\d{1,2})[:.](\d{2})")
 CLOSED = re.compile(r"\bchius[oa]\b", re.I)

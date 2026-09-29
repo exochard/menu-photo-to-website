@@ -3,8 +3,11 @@ import pytest
 import yaml
 
 from menuvision.agent import Change, apply_approved, diff, hours_question, merge_reads, run
-from menuvision.ocr import Line, Reader, Word
+from menuvision.ocr import RECOGNIZER, Line, Reader, Word
 from menuvision.synth import sample
+
+
+needs_models = pytest.mark.skipif(not RECOGNIZER.exists(), reason="models not downloaded (./fetch_models.sh)")
 
 
 def line(y: float, text: str, confidence: float) -> Line:
@@ -50,12 +53,25 @@ def test_apply_writes_only_approved_changes_and_keeps_a_backup(tmp_path):
     assert "12,00" in (tmp_path / "site.yaml.bak").read_text()
 
 
+@needs_models
 def test_blank_photo_asks_for_a_retake_and_edits_nothing():
     outcome = run(np.full((600, 400, 3), 128, np.uint8), site([]), Reader())
     assert outcome.status == "retake" and not outcome.proposals
     assert outcome.trace[0] == {"tool": "find_page", "found": False, "coverage": 0.0}
 
 
+@needs_models
+def test_a_page_running_out_of_the_photo_asks_for_a_retake():
+    # A tuning seed where the steep sheet leaves the frame and the outline cuts the text.
+    s = sample(36, tilt=0.16, blur=2.2)
+    groups = [{"name": sec.name, "items": [{"name": i.name, "price": f"{i.price} €"} for i in sec.items]}
+              for sec in s.truth.sections]
+    outcome = run(s.photo, site(groups), Reader())
+    assert outcome.status == "retake" and not outcome.proposals
+    assert outcome.trace[-1]["cut_at_edge"] >= 2
+
+
+@needs_models
 def test_a_changed_price_on_a_real_photo_becomes_a_proposal():
     s = sample(7, tilt=0.04, blur=0.6)  # a tuning seed; evaluation seeds start at 1000
     groups = [{"name": sec.name, "items": [{"name": i.name, "price": f"{i.price} €"} for i in sec.items]}

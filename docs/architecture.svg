@@ -39,9 +39,9 @@
 
   <rect class="cv" x="200" y="190" width="300" height="100" rx="10"/>
   <text class="t" x="215" y="216">read · OpenCV 5 dnn</text>
-  <text class="s" x="215" y="236">PP-OCRv3 DB text detection</text>
-  <text class="s" x="215" y="253">→ words split at ink gaps</text>
-  <text class="s" x="215" y="270">→ CRNN + CTC decode, confidence per word</text>
+  <text class="s" x="215" y="236">PP-OCRv3 DB text detection, page levelled</text>
+  <text class="s" x="215" y="253">→ PP-OCRv5 Latin reads each phrase (à è ì €)</text>
+  <text class="s" x="215" y="270">→ CTC decode, confidence per line</text>
 
   <rect class="cv" x="200" y="330" width="300" height="80" rx="10"/>
   <text class="t" x="215" y="356">reread_region · OpenCV 5</text>
@@ -51,14 +51,15 @@
   <path class="edge" d="M350 150 V190"/>
   <path class="warn" d="M500 250 C560 250 560 370 500 370"/>
   <text class="lbl" x="560" y="300">line confidence</text>
-  <text class="lbl" x="560" y="316">&lt; 0.95</text>
+  <text class="lbl" x="560" y="316">&lt; 0.93</text>
 
   <!-- retake -->
   <path class="warn" d="M200 110 C120 110 110 300 150 330"/>
   <rect class="human" x="20" y="330" width="130" height="70" rx="10"/>
   <text class="t" x="85" y="360" text-anchor="middle">Retake</text>
   <text class="s" x="85" y="380" text-anchor="middle">request, no edit</text>
-  <text class="lbl" x="40" y="250">no page</text>
+  <text class="lbl" x="40" y="250">no page, or</text>
+  <text class="lbl" x="40" y="266">text cut at edge</text>
 
   <!-- agent column -->
   <rect class="agent" x="640" y="70" width="250" height="80" rx="10"/>
@@ -83,8 +84,8 @@
 
   <rect class="agent" x="640" y="330" width="250" height="110" rx="10"/>
   <text class="t" x="655" y="356">Plan</text>
-  <text class="s" x="655" y="376">confidence ≥ 0.95 → proposal</text>
-  <text class="s" x="655" y="393">confidence &lt; 0.95 → question</text>
+  <text class="s" x="655" y="376">confidence ≥ 0.93 → proposal</text>
+  <text class="s" x="655" y="393">confidence &lt; 0.93 → question</text>
   <text class="s" x="655" y="410">missing item, changed hours</text>
   <text class="s" x="655" y="427">→ always a question</text>
   <path class="edge" d="M765 290 V330"/>
