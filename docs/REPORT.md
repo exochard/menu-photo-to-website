@@ -25,8 +25,11 @@ site is rebuilt only from approved changes.
 1. **find_page.** Canny edges, dilation, convex hulls, and the largest four-corner hull
    covering at least 15% of the photo; a perspective warp flattens it. Hulls rather than
    raw contours, because glare or a thumb breaks the page edge into an open contour with
-   almost no area while its hull is still the page. No page found ends the run with a
-   retake request.
+   almost no area while its hull is still the page. When no hull qualifies, the agent
+   makes a second attempt: a sheet that runs out of the frame has its outline cut in
+   pieces (the left edge, the rest), so it takes the hull of all long edge pieces together
+   and simplifies it until four corners remain. No page after both attempts ends the run
+   with a retake request.
 2. **level and read.** OpenCV 5 `dnn` runs both networks. The PP-OCRv3 DB text detector
    (`cv.dnn.TextDetectionModel_DB`) finds phrases, and PaddlePaddle's PP-OCRv5 Latin
    recogniser (`cv.dnn.readNet`, Apache-2.0) reads each phrase whole at its own aspect
@@ -44,8 +47,10 @@ site is rebuilt only from approved changes.
    against the paper around it (a morphological closing), so shadows and glare cancel out.
 3. **Cut text check.** When two or more rows run into the left or right edge of the
    flattened page, the page outline cut through the menu (the sheet runs out of the photo,
-   or a hand covers it). Names read there are fragments, so the run ends with a retake
-   request instead of proposing them as new dishes.
+   or a hand covers it). Names read there are fragments, so the agent tries the joined
+   outline of step 1; when that finds the same outline or cuts the text too, the run ends
+   with a retake request instead of proposing fragments as new dishes. A page with no
+   readable price gets the same second attempt.
 4. **reread_region.** When any line is under 0.93 confidence, the page is read again after
    an unsharp mask, and each weak line keeps the likelier of its two readings.
 5. **parse.** Lines become sections, items with prices, opening hours and closing notes.
@@ -62,8 +67,11 @@ site is rebuilt only from approved changes.
    old one kept as `.bak`) and the static site is rebuilt by a config-driven builder that
    escapes every client string.
 
-What the camera measured decides the next step four times: page or retake, whole menu or
-retake, one read or two, proposal or question.
+What the camera measured decides the next step at four points: which outline to trust
+(single, joined), whether to ask for a new photo, whether to read twice, and whether each
+change is a proposal or a question. Every step writes what it measured into the trace, and
+every branch also writes the step it chose next (`"next": "try the joined outline"`); the
+demo page shows that trace.
 
 ## Architecture on AWS
 
@@ -107,13 +115,16 @@ ASCII. The baseline columns are that version, run on the same photos.
 |---|---:|---:|---:|---:|---:|
 | 0.04, 0.6 | 30/30 | 0.000 | 199/199 (100%) | 128/199 (64%) | 30/30 |
 | 0.08, 1.0 | 30/30 | 0.000 | 199/199 (100%) | 117/199 (59%) | 30/30 |
-| 0.12, 1.6 | 29/30 | 0.002 | 195/199 (98%) | 58/199 (29%) | 30/30 |
-| 0.16, 2.2 | 26/30 | 0.011 | 191/199 (96%) | 6/199 (3%) | 29/30 |
+| 0.12, 1.6 | 30/30 | 0.001 | 196/199 (98%) | 58/199 (29%) | 30/30 |
+| 0.16, 2.2 | 30/30 | 0.007 | 194/199 (97%) | 6/199 (3%) | 30/30 |
 | 0.10, 1.2, phone | 30/30 | 0.000 | 198/199 (99%) | 89/199 (45%) | 30/30 |
-| 0.16, 1.8, phone | 26/30 | 0.010 | 194/199 (97%) | 18/199 (9%) | 29/30 |
+| 0.16, 1.8, phone | 30/30 | 0.004 | 198/199 (99%) | 18/199 (9%) | 30/30 |
 
-Finding and reading a page takes 0.22 s per photo on a laptop CPU, against 0.73 s for
-the word-by-word CRNN (30 photos, nothing else running).
+The page is found with the single outline first and the joined outline when that fails,
+as in the agent. The baseline run used the single outline only, which missed the page in
+1, 4 and 4 of 30 photos in the three hardest conditions. Finding and reading a page takes
+0.33 to 0.36 s per photo on a laptop CPU, against 0.66 to 1.05 s for the word-by-word
+CRNN (`seconds_per_photo` in the result files).
 
 **The agent, end to end** (`eval_agent.py`, `docs/results/agent*.json`). Each photo's site
 config is its printed menu with two prices changed and one extra dish, so a perfect agent
@@ -124,21 +135,28 @@ nothing else.
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 0.04, 0.6 | 60/60 | 59/60 | 56/60 | 0 | 0 | 30/30 | 1.00 | 0 |
 | 0.08, 1.0 | 60/60 | 60/60 | 53/60 | 0 | 0 | 30/30 | 1.00 | 0 |
-| 0.12, 1.6 | 58/60 | 56/60 | 34/60 | 0 | 0 | 29/30 | 1.00 | 1 |
-| 0.16, 2.2 | 49/60 | 46/60 | 13/60 | 0 | 4 | 26/30 | 1.10 | 4 |
+| 0.12, 1.6 | 60/60 | 58/60 | 34/60 | 0 | 0 | 30/30 | 1.00 | 0 |
+| 0.16, 2.2 | 57/60 | 54/60 | 13/60 | 0 | 4 | 30/30 | 1.10 | 0 |
 | 0.10, 1.2, phone | 60/60 | 57/60 | 37/60 | 0 | 1 | 30/30 | 1.00 | 0 |
-| 0.16, 1.8, phone | 50/60 | 46/60 | 16/60 | 0 | 6 | 26/30 | 1.07 | 4 |
+| 0.16, 1.8, phone | 57/60 | 53/60 | 16/60 | 0 | 6 | 30/30 | 1.10 | 0 |
 
 Across 180 photos the agent proposed no wrong change. The CRNN version proposed 11 on the
 harder photos, where a confident misread became a proposal. A perfect run asks one question
 per photo (the extra dish); the agent asks 1.00 to 1.10.
 
+The joined outline is the latest change. Before it, the two hardest conditions gave 49/60
+and 50/60 with 4 retake requests each, and the extra dish went unasked on those 8 photos;
+on tuning seeds 0 to 99 it lifted them from 157/200 and 151/200 to 193/200 and 184/200,
+with no wrong proposal before or after.
+
 **Failures, as measured.**
 
-- Every retake (1, 4 and 4) is a photo where no page outline was found: at a steep angle
-  the sheet runs out of the frame. The agent asks for a new photo rather than guessing.
-- Every changed price the agent did not propose on a photo it read became a question to the
-  owner (0 to 3 per condition); none was dropped silently.
+- No photo in the evaluation ended in a retake. At a steep angle the sheet runs out of the
+  frame, and the joined outline finds it; the retake request remains for a menu the frame
+  cuts through (a test crops one through its price column) and for a photo too blurred to
+  outline.
+- Every changed price the agent did not propose became a question to the owner, with the
+  price read correctly (0 to 3 per condition); none was dropped silently.
 - The re-read now adds little (0 to 4 proposals per condition), because the first read is
   rarely unsure.
 - Past what a person can read, a confident misread still passes. The demo photo blurred at
@@ -153,8 +171,8 @@ per photo (the extra dish); the agent asks 1.00 to 1.10.
 
 - The evaluation is synthetic. Real menus have handwriting, chalkboards, two columns,
   decorative fonts and photos on laminated card; none of those is measured here.
-- A photo that runs past the page edge ends in a retake; the agent does not read a partial
-  menu.
+- A sheet that runs out of the frame is read when all of its text is inside. When the
+  frame cuts the text, the agent asks for a new photo; it does not read a partial menu.
 - Hours are compared as time ranges only. The owner decides which days change.
 - One page per photo; one menu section per site.
 - The demo's Function URL is public and has no login, so anyone can make the function read
@@ -187,7 +205,7 @@ it, and the failures are reported with the successes.
 ```
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
 ./fetch_models.sh
-.venv/bin/python -m pytest -q                    # 17 tests
+.venv/bin/python -m pytest -q                    # 22 tests
 .venv/bin/python eval.py --n 30                  # reading table
 .venv/bin/python eval_agent.py --n 30            # agent table
 .venv/bin/python eval_agent.py --n 30 --no-reread

@@ -1,8 +1,9 @@
 """The agent loop: a menu photo becomes owner-approved changes to the site config.
 
 Each step is a tool call recorded in the trace, and what the camera saw decides the next
-one. No page in the photo ends in a retake request. Low-confidence lines trigger a second
-read of a sharpened page. A change read with low confidence becomes a question to the
+one. A page not found, cut through its text or without a readable price gets a second
+attempt with the outline joined from its pieces, then a retake request. Low-confidence
+lines trigger a second read of a sharpened page. A change read with low confidence becomes a question to the
 owner, never a proposal, and nothing reaches the site before the owner approves it.
 
     python -m menuvision.agent photo.jpg --config site.yaml [--plan plan.json]
@@ -144,16 +145,35 @@ def hours_question(cfg: dict[str, Any], hours: list[str]) -> str | None:
             "Which days should change?")
 
 
-def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW) -> Outcome:
-    outcome = Outcome("no_changes")
-    trace = outcome.trace
-    page = find_page(photo)
-    trace.append({"tool": "find_page", "found": page.quad is not None, "coverage": round(page.coverage, 3)})
-    if page.quad is None:
-        outcome.status = "retake"
-        outcome.questions.append("I cannot find the edges of the page. Please take the photo again, "
-                                 "with the whole sheet in the frame on a darker surface.")
-        return outcome
+RETAKE = {
+    "no_page": "I cannot find the edges of the page. Please take the photo again, "
+               "with the whole sheet in the frame on a darker surface.",
+    "cut": "Part of the menu is outside the photo or hidden. Please take it again "
+           "with the whole sheet in the frame.",
+    "no_prices": "I found the page but could not read any prices. "
+                 "Please take the photo again, closer and in focus.",
+}
+
+
+def read_page(photo: np.ndarray, reader: Reader, joined: bool, trace: list[dict[str, Any]],
+              low: float, tried: np.ndarray | None = None
+              ) -> tuple[list[tuple[str, str, str, float]], list[str], str, np.ndarray | None]:
+    """One attempt at the page: find it, level it, read it.
+
+    Returns (items, hours, failure, quad); `failure` names what went wrong ("no_page",
+    "same_page", "cut", "no_prices") or is empty. Each step records what it measured and,
+    where the loop branches, what it does next. `tried` is the outline of an earlier attempt;
+    finding it again ends the attempt without reading the same page twice.
+    """
+    otherwise = "ask for a retake" if joined else "try the joined outline"
+    page = find_page(photo, joined=joined)
+    same = page.quad is not None and tried is not None and np.abs(page.quad - tried).max() < 10
+    trace.append({"tool": "find_page", "outline": "joined" if joined else "single",
+                  "found": page.quad is not None, "coverage": round(page.coverage, 3)}
+                 | ({"same_as_before": True} if same else {})
+                 | ({} if page.quad is not None and not same else {"next": otherwise}))
+    if page.quad is None or same:
+        return [], [], "same_page" if same else "no_page", page.quad
     flat = reader.level(page.image)
     trace.append({"tool": "level", "rotated": flat is not page.image})
     lines = reader.read(flat)
@@ -162,13 +182,11 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
     width = flat.shape[1]
     cut = sum(line.words[0].x0 <= 1 or line.words[-1].x1 >= width - 1 for line in lines)
     if cut >= 2:
-        trace.append({"tool": "read", "lines": len(lines), "cut_at_edge": cut})
-        outcome.status = "retake"
-        outcome.questions.append("Part of the menu is outside the photo or hidden. Please take it again "
-                                 "with the whole sheet in the frame.")
-        return outcome
+        trace.append({"tool": "read", "lines": len(lines), "cut_at_edge": cut, "next": otherwise})
+        return [], [], "cut", page.quad
     weak = sum(line.confidence < low for line in lines)
-    trace.append({"tool": "read", "lines": len(lines), "low_confidence": weak})
+    trace.append({"tool": "read", "lines": len(lines), "low_confidence": weak}
+                 | ({"next": "re-read the weak lines"} if weak else {}))
     if weak:
         lines, replaced = merge_reads(lines, reader.read(sharpen(flat)), low)
         trace.append({"tool": "reread_region", "preprocess": "unsharp", "lines_replaced": replaced,
@@ -182,11 +200,26 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
             confidence[item] = line.confidence
     read = [(section.name, item.name, item.price, confidence.get((item.name, item.price), 0.0))
             for section in menu.sections for item in section.items]
-    trace.append({"tool": "parse", "items": len(read), "hours": menu.hours})
-    if not read:
+    trace.append({"tool": "parse", "items": len(read), "hours": menu.hours}
+                 | ({} if read else {"next": otherwise}))
+    return read, menu.hours, "" if read else "no_prices", page.quad
+
+
+def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW) -> Outcome:
+    outcome = Outcome("no_changes")
+    # A sheet running out of the frame breaks its outline in pieces: the single-outline
+    # attempt then finds nothing, or a part of the sheet that cuts the text. The second
+    # attempt joins the pieces before the agent gives up and asks for a new photo.
+    failures, quad = [], None
+    for joined in (False, True):
+        read, hours, failure, quad = read_page(photo, reader, joined, outcome.trace, low, quad)
+        if not failure:
+            break
+        failures.append(failure)
+    else:
         outcome.status = "retake"
-        outcome.questions.append("I found the page but could not read any prices. "
-                                 "Please take the photo again, closer and in focus.")
+        # The most specific reason: a cut or unreadable page says more than a missing outline.
+        outcome.questions.append(RETAKE[min(failures, key=("cut", "no_prices", "no_page", "same_page").index)])
         return outcome
     section = menu_section(cfg)
     if section is None:
@@ -194,9 +227,9 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
         section = {"groups": []}
     outcome.proposals, questions = diff(section, read, low)
     outcome.questions += questions
-    if question := hours_question(cfg, menu.hours):
+    if question := hours_question(cfg, hours):
         outcome.questions.append(question)
-    trace.append({"tool": "diff_against_site", "proposals": len(outcome.proposals),
+    outcome.trace.append({"tool": "diff_against_site", "proposals": len(outcome.proposals),
                   "questions": len(outcome.questions)})
     outcome.status = "proposals" if outcome.proposals else "no_changes"
     return outcome

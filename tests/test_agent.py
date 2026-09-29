@@ -65,18 +65,38 @@ def test_apply_writes_only_approved_changes_and_keeps_a_backup(tmp_path):
 def test_blank_photo_asks_for_a_retake_and_edits_nothing():
     outcome = run(np.full((600, 400, 3), 128, np.uint8), site([]), Reader())
     assert outcome.status == "retake" and not outcome.proposals
-    assert outcome.trace[0] == {"tool": "find_page", "found": False, "coverage": 0.0}
+    assert outcome.trace == [
+        {"tool": "find_page", "outline": "single", "found": False, "coverage": 0.0,
+         "next": "try the joined outline"},
+        {"tool": "find_page", "outline": "joined", "found": False, "coverage": 0.0,
+         "next": "ask for a retake"}]
 
 
 @needs_models
-def test_a_page_running_out_of_the_photo_asks_for_a_retake():
-    # A tuning seed where the steep sheet leaves the frame and the outline cuts the text.
+def test_a_menu_cut_by_the_frame_asks_for_a_retake():
+    # A tuning seed cropped through the price column: both outlines cut the text.
+    s = sample(3, tilt=0.04, blur=0.6)
+    groups = [{"name": sec.name, "items": [{"name": i.name, "price": f"{i.price} €"} for i in sec.items]}
+              for sec in s.truth.sections]
+    outcome = run(s.photo[:, :1200], site(groups), Reader())
+    assert outcome.status == "retake" and not outcome.proposals
+    assert "outside the photo" in outcome.questions[0]
+    assert outcome.trace[2]["cut_at_edge"] >= 2 and outcome.trace[-1]["next"] == "ask for a retake"
+
+
+@needs_models
+def test_a_sheet_running_out_of_the_frame_is_read_from_its_joined_outline():
+    # A tuning seed where the steep sheet leaves the frame but its text does not: the single
+    # outline is a part of the sheet that cuts the text, the joined one is the whole sheet.
     s = sample(36, tilt=0.16, blur=2.2)
     groups = [{"name": sec.name, "items": [{"name": i.name, "price": f"{i.price} €"} for i in sec.items]}
               for sec in s.truth.sections]
+    target = groups[0]["items"][0]
+    target["price"] = "99,00 €"
     outcome = run(s.photo, site(groups), Reader())
-    assert outcome.status == "retake" and not outcome.proposals
-    assert outcome.trace[-1]["cut_at_edge"] >= 2
+    assert [(c.name, c.old) for c in outcome.proposals] == [(target["name"], "99,00 €")]
+    assert outcome.trace[2].get("next") == "try the joined outline"
+    assert outcome.trace[3]["outline"] == "joined" and outcome.trace[3]["found"]
 
 
 @needs_models

@@ -4,7 +4,7 @@ Each photo's site config is the printed menu with two prices changed and one ext
 so a perfect agent proposes exactly the two old-to-new price changes, asks about the extra
 item, and proposes nothing else. `--no-reread` switches the sharpened second read off.
 
-    .venv/bin/python eval_agent.py --n 30 [--no-reread]
+    .venv/bin/python eval_agent.py --n 30 [--no-reread] [--first-seed 0]
 """
 import argparse
 import json
@@ -40,6 +40,7 @@ def main() -> None:
     ap.add_argument("--n", type=int, default=30)
     ap.add_argument("--no-reread", action="store_true")
     ap.add_argument("--out", default="out/eval-agent.json")
+    ap.add_argument("--first-seed", type=int, default=EVAL_SEED, help="0 for the tuning seeds")
     args = ap.parse_args()
     if args.no_reread:
         agent.merge_reads = lambda first, _second, low=agent.LOW: (first, 0)
@@ -47,7 +48,7 @@ def main() -> None:
     report = {}
     for tilt, blur, phone in CONDITIONS:
         found = right = wrong = asked_extra = questions = retakes = rereads = 0
-        for seed in range(EVAL_SEED, EVAL_SEED + args.n):
+        for seed in range(args.first_seed, args.first_seed + args.n):
             s = sample(seed, tilt, blur, phone)
             cfg, expected = scenario(s, random.Random(seed))
             outcome = agent.run(s.photo, cfg, reader)

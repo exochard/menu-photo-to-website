@@ -106,7 +106,8 @@ $("run").addEventListener("click", async () => {
     lastPlan = plan;
     text($("status"), `${plan.status.replace("_", " ")} · ${plan.seconds}s`);
     $("trace").replaceChildren(...plan.trace.map((s) => {
-      const {tool, ...rest} = s; return text(document.createElement("li"), `${tool} ${JSON.stringify(rest)}`);
+      const {tool, next, ...rest} = s;
+      return text(document.createElement("li"), `${tool} ${JSON.stringify(rest)}${next ? ` → ${next}` : ""}`);
     }));
     const props = plan.proposals.map((c, i) => {
       const li = document.createElement("li"); li.className = "change";

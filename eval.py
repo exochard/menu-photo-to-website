@@ -3,7 +3,8 @@
     python eval.py [--n 30] [--out out/eval.json]
 
 Reports, per condition (tilt, blur): page found, character error rate over all text,
-items whose name and price both come back exactly, and opening hours recovered.
+items whose name and price both come back exactly, and opening hours recovered. When the
+single outline finds no page, the joined outline is tried, as the agent does.
 """
 import argparse
 import json
@@ -50,6 +51,8 @@ def main() -> None:
             s = sample(seed, tilt, blur, phone)
             t = time.perf_counter()
             page = find_page(s.photo)
+            if page.quad is None:
+                page = find_page(s.photo, joined=True)
             lines = [line.text for line in reader.read(reader.level(page.image))]
             secs.append(time.perf_counter() - t)
             found += page.quad is not None

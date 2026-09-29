@@ -18,22 +18,37 @@ def order_corners(pts: np.ndarray) -> np.ndarray:
     return np.float32([pts[s.argmin()], pts[d.argmin()], pts[s.argmax()], pts[d.argmax()]])
 
 
-def find_page(photo: np.ndarray, min_coverage: float = 0.15) -> Page:
+def find_page(photo: np.ndarray, min_coverage: float = 0.15, joined: bool = False) -> Page:
     """Largest convex quadrilateral in the photo, warped to a flat page.
 
     When no quadrilateral covers at least `min_coverage` of the photo, the photo is
     returned as is with `quad=None`, so the caller can ask for a better shot.
+
+    `joined` is the second attempt for a sheet that runs out of the frame: the frame cuts
+    its outline into separate pieces (the left edge, the rest), so no single piece is a
+    quadrilateral. The hull of all long edge pieces together is the visible part of the
+    sheet, simplified until four corners remain.
     """
     gray = cv.cvtColor(photo, cv.COLOR_BGR2GRAY)
     edges = cv.Canny(cv.GaussianBlur(gray, (5, 5), 0), 40, 120)
     edges = cv.dilate(edges, np.ones((5, 5), np.uint8))
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     area = photo.shape[0] * photo.shape[1]
-    # Hulls, not raw contours: a page edge broken by glare or a thumb leaves an open
-    # contour with almost no area, while its hull is still the page outline.
-    hulls = sorted((cv.convexHull(c) for c in contours), key=cv.contourArea, reverse=True)
-    for hull in hulls[:5]:
-        approx = cv.approxPolyDP(hull, 0.02 * cv.arcLength(hull, True), True)
+    if joined:
+        long = [c for c in contours if cv.arcLength(c, False) > 0.1 * min(photo.shape[:2])]
+        if not long:
+            return Page(photo, None, 0.0)
+        hulls, tolerances = [cv.convexHull(np.vstack(long))], (0.02, 0.03, 0.04, 0.06, 0.08)
+    else:
+        # Hulls, not raw contours: a page edge broken by glare or a thumb leaves an open
+        # contour with almost no area, while its hull is still the page outline.
+        hulls = sorted((cv.convexHull(c) for c in contours), key=cv.contourArea, reverse=True)[:5]
+        tolerances = (0.02,)
+    for hull in hulls:
+        for tolerance in tolerances:
+            approx = cv.approxPolyDP(hull, tolerance * cv.arcLength(hull, True), True)
+            if len(approx) <= 4:
+                break
         coverage = cv.contourArea(approx) / area
         if len(approx) != 4 or not cv.isContourConvex(approx) or coverage < min_coverage:
             continue
