@@ -109,6 +109,13 @@ def diff(section: dict[str, Any], read: list[tuple[str, str, str, float]],
             change = Change("price", site_group, item["name"], item.get("price"), price, confidence)
         else:
             change = Change("new_item", group, name, None, price, confidence)
+            # A "new" dish whose name is part of a site dish is more likely a clipped read
+            # of that dish than a new one.
+            part_of = next((item["name"] for k, (_, item) in site.items()
+                            if len(key(name)) >= 4 and key(name) in k), None)
+            if part_of:
+                questions.append(f'I read "{name} {price}". Is that "{part_of}"?')
+                continue
         if confidence < low:
             questions.append(f'I read "{name} {price}" but not clearly. Is that right?')
         else:
@@ -147,10 +154,12 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
         outcome.questions.append("I cannot find the edges of the page. Please take the photo again, "
                                  "with the whole sheet in the frame on a darker surface.")
         return outcome
-    lines = reader.read(page.image)
+    flat = reader.level(page.image)
+    trace.append({"tool": "level", "rotated": flat is not page.image})
+    lines = reader.read(flat)
     # Text running into the left or right edge of the flattened page means the outline cut
     # through the menu (a page partly outside the photo); names read there are fragments.
-    width = page.image.shape[1]
+    width = flat.shape[1]
     cut = sum(line.words[0].x0 <= 1 or line.words[-1].x1 >= width - 1 for line in lines)
     if cut >= 2:
         trace.append({"tool": "read", "lines": len(lines), "cut_at_edge": cut})
@@ -161,7 +170,7 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
     weak = sum(line.confidence < low for line in lines)
     trace.append({"tool": "read", "lines": len(lines), "low_confidence": weak})
     if weak:
-        lines, replaced = merge_reads(lines, reader.read(sharpen(page.image)), low)
+        lines, replaced = merge_reads(lines, reader.read(sharpen(flat)), low)
         trace.append({"tool": "reread_region", "preprocess": "unsharp", "lines_replaced": replaced,
                       "still_low": sum(line.confidence < low for line in lines)})
     menu = parse([line.text for line in lines])
@@ -169,7 +178,8 @@ def run(photo: np.ndarray, cfg: dict[str, Any], reader: Reader, low: float = LOW
     for line in lines:
         match = PRICE.match(re.sub(r"\s+", " ", line.text).strip())
         if match and match.group("name"):
-            confidence[(match.group("name"), match.group("price").replace(".", ","))] = line.confidence
+            item = (match.group("name"), match.group("price").replace(".", ","))
+            confidence[item] = line.confidence
     read = [(section.name, item.name, item.price, confidence.get((item.name, item.price), 0.0))
             for section in menu.sections for item in section.items]
     trace.append({"tool": "parse", "items": len(read), "hours": menu.hours})

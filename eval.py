@@ -50,7 +50,7 @@ def main() -> None:
             s = sample(seed, tilt, blur, phone)
             t = time.perf_counter()
             page = find_page(s.photo)
-            lines = [line.text for line in reader.read(page.image)]
+            lines = [line.text for line in reader.read(reader.level(page.image))]
             secs.append(time.perf_counter() - t)
             found += page.quad is not None
             cers.append(cer(norm(" ".join(lines)), norm(" ".join(s.lines))))

@@ -27,7 +27,7 @@ site is rebuilt only from approved changes.
    raw contours, because glare or a thumb breaks the page edge into an open contour with
    almost no area while its hull is still the page. No page found ends the run with a
    retake request.
-2. **read.** OpenCV 5 `dnn` runs both networks. The PP-OCRv3 DB text detector
+2. **level and read.** OpenCV 5 `dnn` runs both networks. The PP-OCRv3 DB text detector
    (`cv.dnn.TextDetectionModel_DB`) finds phrases, and PaddlePaddle's PP-OCRv5 Latin
    recogniser (`cv.dnn.readNet`, Apache-2.0) reads each phrase whole at its own aspect
    ratio. Its alphabet of 836 characters covers Italian accents and "€", so "ragù",
@@ -38,6 +38,10 @@ site is rebuilt only from approved changes.
    text boxes when that slope exceeds 1%, because a page flattened from a steep photo can
    keep a tilt that puts the right-hand price level with the dish above. Phrases are then
    joined into a row when their boxes share at least half of the shorter box's height.
+   Under blur the detector's box can stop mid-phrase ("Involtini alla" of "Involtini alla
+   messinese"), and the recogniser reads the fragment with full confidence, so each box is
+   first grown sideways while ink continues within one line height. Ink is measured
+   against the paper around it (a morphological closing), so shadows and glare cancel out.
 3. **Cut text check.** When two or more rows run into the left or right edge of the
    flattened page, the page outline cut through the menu (the sheet runs out of the photo,
    or a hand covers it). Names read there are fragments, so the run ends with a retake
@@ -47,7 +51,9 @@ site is rebuilt only from approved changes.
 5. **parse.** Lines become sections, items with prices, opening hours and closing notes.
 6. **diff_against_site.** Names are compared without accents or case with a 0.8
    similarity cut-off, so a site that writes "Caffe" still matches a printed "Caffè"; then
-   prices and hours are compared with the site's `menu` and `hours` sections.
+   prices and hours are compared with the site's `menu` and `hours` sections. A "new" dish
+   whose name is part of a site dish becomes a question ("Is that Involtini alla
+   messinese?"), because it is more likely a clipped read than a new dish.
 7. **Plan.** A change read at 0.93 or more becomes a proposal. Anything weaker becomes a
    question. A dish on the site but not in the photo is always a question, because absence
    in a photo is weak evidence (a crease, a missed line). Changed hours are always a
@@ -76,9 +82,10 @@ retake, one read or two, proposal or question.
 - **Delivery:** `deploy.sh` creates or updates the repository, image, role, function and
   URL; `deploy.sh --down` removes them.
 
-Measured on the live URL, 2026-09-29, with the PP-OCRv5 reader: a plan takes 5.3 s end to
-end on a cold start and 1.8 s warm (three warm runs, 1.7 s in the function); approval and
-rebuild take under 0.2 s. The CRNN version took 7.6 s cold and 4.2 s warm.
+Measured on the live URL, 2026-09-29, with the PP-OCRv5 reader: a plan takes 6.0 s end to
+end on a cold start and 2.8 s warm (two warm runs; levelling and growing the text boxes cost
+about a second); approval and rebuild take under 0.2 s. The CRNN version took 7.6 s cold and
+4.2 s warm.
 
 ## Evaluation
 
@@ -101,9 +108,9 @@ ASCII. The baseline columns are that version, run on the same photos.
 | 0.04, 0.6 | 30/30 | 0.000 | 199/199 (100%) | 128/199 (64%) | 30/30 |
 | 0.08, 1.0 | 30/30 | 0.000 | 199/199 (100%) | 117/199 (59%) | 30/30 |
 | 0.12, 1.6 | 29/30 | 0.002 | 195/199 (98%) | 58/199 (29%) | 30/30 |
-| 0.16, 2.2 | 26/30 | 0.012 | 191/199 (96%) | 6/199 (3%) | 29/30 |
+| 0.16, 2.2 | 26/30 | 0.011 | 191/199 (96%) | 6/199 (3%) | 29/30 |
 | 0.10, 1.2, phone | 30/30 | 0.000 | 198/199 (99%) | 89/199 (45%) | 30/30 |
-| 0.16, 1.8, phone | 26/30 | 0.011 | 194/199 (97%) | 18/199 (9%) | 29/30 |
+| 0.16, 1.8, phone | 26/30 | 0.010 | 194/199 (97%) | 18/199 (9%) | 29/30 |
 
 Finding and reading a page takes 0.22 s per photo on a laptop CPU, against 0.73 s for
 the word-by-word CRNN (30 photos, nothing else running).
@@ -118,22 +125,26 @@ nothing else.
 | 0.04, 0.6 | 60/60 | 59/60 | 56/60 | 0 | 0 | 30/30 | 1.00 | 0 |
 | 0.08, 1.0 | 60/60 | 60/60 | 53/60 | 0 | 0 | 30/30 | 1.00 | 0 |
 | 0.12, 1.6 | 58/60 | 56/60 | 34/60 | 0 | 0 | 29/30 | 1.00 | 1 |
-| 0.16, 2.2 | 50/60 | 46/60 | 13/60 | 0 | 4 | 26/30 | 1.07 | 4 |
-| 0.10, 1.2, phone | 59/60 | 57/60 | 37/60 | 0 | 1 | 30/30 | 1.03 | 0 |
-| 0.16, 1.8, phone | 48/60 | 46/60 | 16/60 | 0 | 6 | 26/30 | 1.13 | 4 |
+| 0.16, 2.2 | 49/60 | 46/60 | 13/60 | 0 | 4 | 26/30 | 1.10 | 4 |
+| 0.10, 1.2, phone | 60/60 | 57/60 | 37/60 | 0 | 1 | 30/30 | 1.00 | 0 |
+| 0.16, 1.8, phone | 50/60 | 46/60 | 16/60 | 0 | 6 | 26/30 | 1.07 | 4 |
 
 Across 180 photos the agent proposed no wrong change. The CRNN version proposed 11 on the
 harder photos, where a confident misread became a proposal. A perfect run asks one question
-per photo (the extra dish); the agent asks 1.00 to 1.13.
+per photo (the extra dish); the agent asks 1.00 to 1.10.
 
 **Failures, as measured.**
 
 - Every retake (1, 4 and 4) is a photo where no page outline was found: at a steep angle
   the sheet runs out of the frame. The agent asks for a new photo rather than guessing.
 - Every changed price the agent did not propose on a photo it read became a question to the
-  owner (0 to 4 per condition); none was dropped silently.
+  owner (0 to 3 per condition); none was dropped silently.
 - The re-read now adds little (0 to 4 proposals per condition), because the first read is
   rarely unsure.
+- Past what a person can read, a confident misread still passes. The demo photo blurred at
+  sigma 4 gives "Cannolo siciliano 1,50" at 0.933, just over the threshold, and at 4.5 the
+  page outline is lost and the agent asks for a retake. The owner's approval of each change
+  is the guard for the first case.
 - The confidence threshold is imperfect. On tuning seeds 0 to 39 it flags 23% of misread
   item lines and 6% of correctly read ones. A misread the recogniser is sure of can pass as
   a proposal; the owner's approval step is the guard for those.

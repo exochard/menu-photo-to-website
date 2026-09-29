@@ -90,7 +90,8 @@ def test_find_page_reports_a_missing_page():
 @pytest.mark.skipif(not RECOGNIZER.exists(), reason="models not downloaded (./fetch_models.sh)")
 def test_end_to_end_reads_names_with_accents_prices_and_hours():
     s = sample(7, tilt=0.06, blur=0.8)
-    menu = parse([line.text for line in Reader().read(find_page(s.photo).image)])
+    reader = Reader()
+    menu = parse([line.text for line in reader.read(reader.level(find_page(s.photo).image))])
     assert menu.hours == s.truth.hours
     want = [(i.name, i.price) for sec in s.truth.sections for i in sec.items]
     got = [(i.name, i.price) for sec in menu.sections for i in sec.items]

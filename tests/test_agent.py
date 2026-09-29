@@ -41,6 +41,14 @@ def test_diff_proposes_confident_changes_and_asks_about_the_rest():
     assert len(questions) == 2
 
 
+def test_a_new_dish_that_is_part_of_a_site_dish_is_asked_not_proposed():
+    section = site([{"name": "Secondi", "items": [
+        {"name": "Involtini alla messinese", "price": "14,00 €"}]}])["pages"][0]["sections"][0]
+    proposals, questions = diff(section, [("Secondi", "Involtini alla", "14,00", 0.98)])
+    assert proposals == []
+    assert questions[0] == 'I read "Involtini alla 14,00". Is that "Involtini alla messinese"?'
+
+
 def test_apply_writes_only_approved_changes_and_keeps_a_backup(tmp_path):
     config = tmp_path / "site.yaml"
     config.write_text(yaml.safe_dump(site([{"name": "Primi", "items": [
@@ -80,7 +88,7 @@ def test_a_changed_price_on_a_real_photo_becomes_a_proposal():
     target["price"] = "99,00 €"
     outcome = run(s.photo, site(groups), Reader())
     assert [(c.kind, c.name, c.old) for c in outcome.proposals] == [("price", target["name"], "99,00 €")]
-    assert [step["tool"] for step in outcome.trace][:2] == ["find_page", "read"]
+    assert [step["tool"] for step in outcome.trace][:3] == ["find_page", "level", "read"]
 
 
 def test_changed_hours_become_a_question_and_matching_hours_do_not():

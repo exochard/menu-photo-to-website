@@ -28,9 +28,9 @@ and `apply_approved`. What the camera measured picks the next step:
 | 0.04, 0.6 | 100% | 60/60 | 0 |
 | 0.08, 1.0 | 100% | 60/60 | 0 |
 | 0.12, 1.6 | 98% | 58/60 | 0 |
-| 0.16, 2.2 | 96% | 50/60 | 0 |
-| 0.10, 1.2, phone shadow, glare, JPEG | 99% | 59/60 | 0 |
-| 0.16, 1.8, phone shadow, glare, JPEG | 97% | 48/60 | 0 |
+| 0.16, 2.2 | 96% | 49/60 | 0 |
+| 0.10, 1.2, phone shadow, glare, JPEG | 99% | 60/60 | 0 |
+| 0.16, 1.8, phone shadow, glare, JPEG | 97% | 50/60 | 0 |
 
 The menus include accents and "€" ("ragù", "lunedì", "12,50 €"). The first version, with
 the OpenCV Zoo CRNN, read 64%, 59% and 29% of items on the first three conditions and made

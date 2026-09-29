@@ -5,7 +5,7 @@
   "cer_mean": 0.0,
   "items_exact": "199/199",
   "hours_exact": "30/30",
-  "seconds_per_photo": 0.23
+  "seconds_per_photo": 0.37
  },
  "tilt=0.08,blur=1.0": {
   "photos": 30,
@@ -13,7 +13,7 @@
   "cer_mean": 0.0,
   "items_exact": "199/199",
   "hours_exact": "30/30",
-  "seconds_per_photo": 0.23
+  "seconds_per_photo": 0.32
  },
  "tilt=0.12,blur=1.6": {
   "photos": 30,
@@ -21,15 +21,15 @@
   "cer_mean": 0.002,
   "items_exact": "195/199",
   "hours_exact": "30/30",
-  "seconds_per_photo": 0.26
+  "seconds_per_photo": 0.31
  },
  "tilt=0.16,blur=2.2": {
   "photos": 30,
   "page_found": "26/30",
-  "cer_mean": 0.012,
+  "cer_mean": 0.011,
   "items_exact": "191/199",
   "hours_exact": "29/30",
-  "seconds_per_photo": 0.29
+  "seconds_per_photo": 0.32
  },
  "tilt=0.1,blur=1.2,phone": {
   "photos": 30,
@@ -37,14 +37,14 @@
   "cer_mean": 0.0,
   "items_exact": "198/199",
   "hours_exact": "30/30",
-  "seconds_per_photo": 0.23
+  "seconds_per_photo": 0.32
  },
  "tilt=0.16,blur=1.8,phone": {
   "photos": 30,
   "page_found": "26/30",
-  "cer_mean": 0.011,
+  "cer_mean": 0.01,
   "items_exact": "194/199",
   "hours_exact": "29/30",
-  "seconds_per_photo": 0.26
+  "seconds_per_photo": 0.32
  }
 }

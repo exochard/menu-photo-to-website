@@ -28,28 +28,28 @@
  },
  "tilt=0.16,blur=2.2": {
   "photos": 30,
-  "price_changes_proposed": "50/60",
+  "price_changes_proposed": "49/60",
   "wrong_proposals": 0,
   "asked_about_extra_item": "26/30",
-  "questions_per_photo": 1.07,
+  "questions_per_photo": 1.1,
   "retake_requests": 4,
   "photos_reread": 13
  },
  "tilt=0.1,blur=1.2,phone": {
   "photos": 30,
-  "price_changes_proposed": "59/60",
+  "price_changes_proposed": "60/60",
   "wrong_proposals": 0,
   "asked_about_extra_item": "30/30",
-  "questions_per_photo": 1.03,
+  "questions_per_photo": 1.0,
   "retake_requests": 0,
   "photos_reread": 7
  },
  "tilt=0.16,blur=1.8,phone": {
   "photos": 30,
-  "price_changes_proposed": "48/60",
+  "price_changes_proposed": "50/60",
   "wrong_proposals": 0,
   "asked_about_extra_item": "26/30",
-  "questions_per_photo": 1.13,
+  "questions_per_photo": 1.07,
   "retake_requests": 4,
   "photos_reread": 9
  }
