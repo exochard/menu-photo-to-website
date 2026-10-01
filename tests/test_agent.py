@@ -1,10 +1,15 @@
+import random
+from pathlib import Path
+
+import cv2 as cv
 import numpy as np
 import pytest
 import yaml
+from PIL import Image, ImageDraw, ImageFont
 
 from menuvision.agent import Change, apply_approved, diff, hours_question, merge_reads, run
 from menuvision.ocr import RECOGNIZER, Line, Reader, Word
-from menuvision.synth import sample
+from menuvision.synth import FONTS, photograph, sample
 
 
 needs_models = pytest.mark.skipif(not RECOGNIZER.exists(), reason="models not downloaded (./fetch_models.sh)")
@@ -25,6 +30,24 @@ def test_reread_replaces_only_weak_lines_with_likelier_ones():
     merged, replaced = merge_reads(first, second)
     assert [l.text for l in merged] == ["Carbonara 12,00", "Amatriciana 11,00"]
     assert replaced == 1
+
+
+def test_reread_never_takes_the_other_column_of_the_same_row():
+    left = Line(10, [Word(60, 300, "Caffe 0,80", 0.5)])
+    right = Line(11, [Word(600, 900, "Fanta 1,00", 0.99)])
+    assert merge_reads([left], [right])[0] == [left]
+    better = Line(11, [Word(60, 300, "Caffè 0,80", 0.97)])
+    assert merge_reads([left], [right, better])[0] == [better]
+
+
+def test_a_new_dish_read_like_a_piece_of_a_description_is_asked_not_proposed():
+    section = site([{"name": "Primi", "items": [{"name": "Carbonara", "price": "12,00 €"}]}])["pages"][0]["sections"][0]
+    read = [("", "Carbonara", "12,00", 0.99), ("", "Tagliatelle al ragù", "11,00", 0.99),
+            ("", "FOUR", "5,99", 0.99), ("", "Onions, Green Peppers, Mozzarella", "14,99", 0.99),
+            ("", "served with roasted potatoes", "14,99", 0.99), ("", "(v)", "3,00", 0.99)]
+    proposals, questions = diff(section, read)
+    assert [c.name for c in proposals] == ["Tagliatelle al ragù"]
+    assert sum("Is that a new dish?" in q for q in questions) == 4
 
 
 def test_diff_proposes_confident_changes_and_asks_about_the_rest():
@@ -118,3 +141,24 @@ def test_changed_hours_become_a_question_and_matching_hours_do_not():
     assert hours_question(cfg, ["12:00-15:00", "19:30-23:00"]) is None
     assert "12:30-15:00" in hours_question(cfg, ["12:30-15:00", "19:30-23:00"])
     assert hours_question(site([]), ["12:00-15:00"]) is None  # no hours section: nothing to compare
+
+
+@needs_models
+@pytest.mark.skipif(not Path(FONTS[0]).exists(), reason="font missing")
+def test_a_price_printed_below_its_dish_is_asked_about_never_proposed():
+    page = Image.new("RGB", (1000, 1400), (245, 242, 235))
+    draw = ImageDraw.Draw(page)
+    draw.text((500, 70), "Trattoria da Nino", font=ImageFont.truetype(FONTS[0], 54), fill=(30, 30, 30), anchor="mt")
+    body = ImageFont.truetype(FONTS[0], 34)
+    for i, (name, price) in enumerate([("Agnello panato alla frutta secca", "25,80"),
+                                       ("Bocconcini d'anatra al miele", "22,50"), ("Tagliata di manzo al pepe", "24,00")]):
+        draw.text((500, 220 + 190 * i), name, font=body, fill=(30, 30, 30), anchor="mt")
+        draw.text((500, 280 + 190 * i), f"€ {price}", font=body, fill=(30, 30, 30), anchor="mt")
+    photo = photograph(cv.cvtColor(np.array(page), cv.COLOR_RGB2BGR), random.Random(5), tilt=0.04, blur=0.6)
+    cfg = site([{"name": "Secondi", "items": [{"name": "Agnello panato alla frutta secca", "price": "20,00 €"},
+                                              {"name": "Bocconcini d'anatra al miele", "price": "22,50 €"}]}])
+    outcome = run(photo, cfg, Reader())
+    # The price was paired with the line above it by layout alone, so the owner confirms it.
+    assert outcome.proposals == []
+    assert 'I read "Agnello panato alla frutta secca 25,80" but not clearly. Is that right?' in outcome.questions
+    assert outcome.trace[-2]["items"] == 3

@@ -1,0 +1,755 @@
+{
+ "photos": 11,
+ "labelled": 49,
+ "right_price": 15,
+ "wrong_price": 0,
+ "retakes": 7,
+ "price_changes": 0,
+ "new_dish_proposals": 14,
+ "questions": 81,
+ "rows": [
+  {
+   "photo": "ov076.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 0,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.6
+  },
+  {
+   "photo": "ov116.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 2,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.3
+  },
+  {
+   "photo": "ov133.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 3,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.3
+  },
+  {
+   "photo": "ov141.jpg",
+   "status": "read",
+   "failures": [
+    "no_page"
+   ],
+   "items_read": 5,
+   "labelled": 4,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "no_changes",
+   "proposals": [],
+   "questions": [
+    "I read \"VEDUZ2)A 14,06\" but not clearly. Is that right?",
+    "I read \"0 64,00\". Is that a new dish?",
+    "I read \"C RoGOGnGe 70,00\" but not clearly. Is that right?",
+    "I read \"Tu un 10,06 26,50\". Is that a new dish?",
+    "I read \"1456 ROSTO DECLA 8,59\" but not clearly. Is that right?",
+    "\"Verduzzo Jaguss\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Broy Collavini\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Cervaro della Sala\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Greco di Tufo\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "VEDUZ2)A",
+     "14,06"
+    ],
+    [
+     "0",
+     "64,00"
+    ],
+    [
+     "C RoGOGnGe",
+     "70,00"
+    ],
+    [
+     "Tu un 10,06",
+     "26,50"
+    ],
+    [
+     "1456 ROSTO DECLA",
+     "8,59"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  {
+   "photo": "ov145.jpg",
+   "status": "read",
+   "failures": [],
+   "items_read": 59,
+   "labelled": 6,
+   "right_price": 6,
+   "wrong_price": [],
+   "agent": "proposals",
+   "proposals": [
+    [
+     "new_item",
+     "Latte Bianco",
+     null,
+     "0,80"
+    ],
+    [
+     "new_item",
+     "Birra Peroni cl.66",
+     null,
+     "1,80"
+    ],
+    [
+     "new_item",
+     "Birra Heineken cl.66",
+     null,
+     "2,50"
+    ],
+    [
+     "new_item",
+     "EstaThè Brik el.200",
+     null,
+     "1,00"
+    ],
+    [
+     "new_item",
+     "Pizzette",
+     null,
+     "1,30"
+    ],
+    [
+     "new_item",
+     "Panino Napoletano",
+     null,
+     "1,30"
+    ],
+    [
+     "new_item",
+     "Panino & Focaccie",
+     null,
+     "3,00"
+    ],
+    [
+     "new_item",
+     "Spremuta d'arancia",
+     null,
+     "2,00"
+    ],
+    [
+     "new_item",
+     "Succhi di Frutta cl.125",
+     null,
+     "1,00"
+    ],
+    [
+     "new_item",
+     "BECK'S cl.3",
+     null,
+     "2,00"
+    ]
+   ],
+   "questions": [
+    "I read \"Fanta latt.cl.33 1,00\" but not clearly. Is that right?",
+    "I read \"Coca Zero latt.cl.33 1,00\" but not clearly. Is that right?",
+    "I read \"Sprite latt.cl.33 1,00\" but not clearly. Is that right?",
+    "I read \"Acqua Bott. cl 500 0,60\" but not clearly. Is that right?",
+    "I read \"Acqua Bott. It. 1,5 1,00\". Is that a new dish?",
+    "I read \"Latte Macchiato 1,20\" but not clearly. Is that right?",
+    "I read \"Thè & Camomilla 1,00\" but not clearly. Is that right?",
+    "I read \"Birra Peroni cl.33 1,30\" but not clearly. Is that right?",
+    "I read \"Orzo Espresso 1,00\" but not clearly. Is that right?",
+    "I read \"Birra Heineken cl.33 1,50\" but not clearly. Is that right?",
+    "I read \"Cioccolata Calda 1,30\" but not clearly. Is that right?",
+    "I read \"CERES cl.33 2,50\" but not clearly. Is that right?",
+    "I read \"Crodino & Tassoni 1,50\" but not clearly. Is that right?",
+    "I read \"Cocktail SP 1,50\" but not clearly. Is that right?",
+    "I read \"Amari 1,50\" but not clearly. Is that right?",
+    "I read \"San Bitter SP 1,50\" but not clearly. Is that right?",
+    "I read \"Brandy 1,50\" but not clearly. Is that right?",
+    "I read \"Campari Lischio 2,00\" but not clearly. Is that right?",
+    "I read \"Cognac 2,00\" but not clearly. Is that right?",
+    "I read \"Campari Corretto 2,50\" but not clearly. Is that right?",
+    "I read \"Whisky & Baileys 2,00\" but not clearly. Is that right?",
+    "I read \"Chinotto SP 1,50\" but not clearly. Is that right?",
+    "I read \"Grappa 2,00\" but not clearly. Is that right?",
+    "I read \"Chinotto Nero cl.500 2,00\" but not clearly. Is that right?",
+    "I read \"Vodka 1,50\" but not clearly. Is that right?",
+    "I read \"Schweppes cl.180 1,50\" but not clearly. Is that right?",
+    "I read \"Drin Vari 3,00\" but not clearly. Is that right?",
+    "I read \"RE Bull Lici 3,00\" but not clearly. Is that right?",
+    "I read \"GATORADE cl.500 2,00\" but not clearly. Is that right?",
+    "I read \"Cornetti Assortiti 0,80\" but not clearly. Is that right?",
+    "I read \"EstaThè Bart cl.33 1,30\" but not clearly. Is that right?",
+    "I read \"Biscotti Amarena 1,00\" but not clearly. Is that right?",
+    "I read \"Pepsi latt. cl.33 1,00\" but not clearly. Is that right?",
+    "I read \"Coca Cola latt. cl.33 1,00\" but not clearly. Is that right?",
+    "I read \"Tramezzino 2,50\" but not clearly. Is that right?",
+    "I read \"EstaThè bott. It 1,5 3,00\". Is that a new dish?",
+    "I read \"Coca Cola It.2 3,00\" but not clearly. Is that right?",
+    "I read \"Fanta It.2 3,00\" but not clearly. Is that right?",
+    "I read \"RED Bull Corretta 5,00\" but not clearly. Is that right?",
+    "I read \"Prosecco cl.200 3,00\" but not clearly. Is that right?",
+    "I read \"Birra CORONA 3,00\" but not clearly. Is that right?",
+    "I read \"Succhi di Frutta cl.200 1,50\" but not clearly. Is that right?",
+    "I read \"TUBORG cl.33 2,50\" but not clearly. Is that right?"
+   ],
+   "read": [
+    [
+     "Caffè Espresso",
+     "0,80"
+    ],
+    [
+     "Fanta latt.cl.33",
+     "1,00"
+    ],
+    [
+     "Caffè Corretto",
+     "1,20"
+    ],
+    [
+     "Coca Zero latt.cl.33",
+     "1,00"
+    ],
+    [
+     "Caffè Decaffeinato",
+     "0,90"
+    ],
+    [
+     "Sprite latt.cl.33",
+     "1,00"
+    ],
+    [
+     "Caffè Ginseng",
+     "1,00"
+    ],
+    [
+     "Acqua Bott. cl 500",
+     "0,60"
+    ],
+    [
+     "Caffè alla Nocciola",
+     "1,50"
+    ],
+    [
+     "Acqua Bott. It. 1,5",
+     "1,00"
+    ],
+    [
+     "Cappuccino",
+     "1,20"
+    ],
+    [
+     "Latte Macchiato",
+     "1,20"
+    ],
+    [
+     "Thè & Camomilla",
+     "1,00"
+    ],
+    [
+     "Birra Peroni cl.33",
+     "1,30"
+    ],
+    [
+     "Latte Bianco",
+     "0,80"
+    ],
+    [
+     "Birra Peroni cl.66",
+     "1,80"
+    ],
+    [
+     "Orzo Espresso",
+     "1,00"
+    ],
+    [
+     "Birra Heineken cl.33",
+     "1,50"
+    ],
+    [
+     "Cioccolata Calda",
+     "1,30"
+    ],
+    [
+     "Birra Heineken cl.66",
+     "2,50"
+    ],
+    [
+     "CERES cl.33",
+     "2,50"
+    ],
+    [
+     "Crodino & Tassoni",
+     "1,50"
+    ],
+    [
+     "Cocktail SP",
+     "1,50"
+    ],
+    [
+     "Amari",
+     "1,50"
+    ],
+    [
+     "San Bitter SP",
+     "1,50"
+    ],
+    [
+     "Brandy",
+     "1,50"
+    ],
+    [
+     "Campari Lischio",
+     "2,00"
+    ],
+    [
+     "Cognac",
+     "2,00"
+    ],
+    [
+     "Campari Corretto",
+     "2,50"
+    ],
+    [
+     "Whisky & Baileys",
+     "2,00"
+    ],
+    [
+     "Chinotto SP",
+     "1,50"
+    ],
+    [
+     "Grappa",
+     "2,00"
+    ],
+    [
+     "Chinotto Nero cl.500",
+     "2,00"
+    ],
+    [
+     "Vodka",
+     "1,50"
+    ],
+    [
+     "Schweppes cl.180",
+     "1,50"
+    ],
+    [
+     "Drin Vari",
+     "3,00"
+    ],
+    [
+     "RE Bull Lici",
+     "3,00"
+    ],
+    [
+     "GATORADE cl.500",
+     "2,00"
+    ],
+    [
+     "Cornetti Assortiti",
+     "0,80"
+    ],
+    [
+     "EstaThè Bart cl.33",
+     "1,30"
+    ],
+    [
+     "Biscotti Amarena",
+     "1,00"
+    ],
+    [
+     "EstaThè Brik el.200",
+     "1,00"
+    ],
+    [
+     "Pizzette",
+     "1,30"
+    ],
+    [
+     "Pepsi latt. cl.33",
+     "1,00"
+    ],
+    [
+     "Panino Napoletano",
+     "1,30"
+    ],
+    [
+     "Coca Cola latt. cl.33",
+     "1,00"
+    ],
+    [
+     "Tramezzino",
+     "2,50"
+    ],
+    [
+     "EstaThè bott. It 1,5",
+     "3,00"
+    ],
+    [
+     "Panino & Focaccie",
+     "3,00"
+    ],
+    [
+     "Coca Cola It.2",
+     "3,00"
+    ],
+    [
+     "Fanta It.2",
+     "3,00"
+    ],
+    [
+     "Spremuta d'arancia",
+     "2,00"
+    ],
+    [
+     "RED Bull Corretta",
+     "5,00"
+    ],
+    [
+     "Prosecco cl.200",
+     "3,00"
+    ],
+    [
+     "Birra CORONA",
+     "3,00"
+    ],
+    [
+     "Succhi di Frutta cl.125",
+     "1,00"
+    ],
+    [
+     "BECK'S cl.3",
+     "2,00"
+    ],
+    [
+     "Succhi di Frutta cl.200",
+     "1,50"
+    ],
+    [
+     "TUBORG cl.33",
+     "2,50"
+    ]
+   ],
+   "seconds": 1.7
+  },
+  {
+   "photo": "wc099.jpg",
+   "status": "read",
+   "failures": [],
+   "items_read": 26,
+   "labelled": 6,
+   "right_price": 4,
+   "wrong_price": [],
+   "agent": "proposals",
+   "proposals": [
+    [
+     "new_item",
+     "Mozzarella & Diced Ham",
+     null,
+     "11,99"
+    ],
+    [
+     "new_item",
+     "Greenwich Village",
+     null,
+     "11,99"
+    ],
+    [
+     "new_item",
+     "TWELVE",
+     null,
+     "21,98"
+    ],
+    [
+     "new_item",
+     "Meatballs (3)",
+     null,
+     "7,99"
+    ]
+   ],
+   "questions": [
+    "I read \"Onions, Green Peppers, Mozzarella 14,99\". Is that a new dish?",
+    "I read \"FOUR 5,99\". Is that a new dish?",
+    "I read \"ies Redion reen epps& 1,99\". Is that a new dish?",
+    "I read \"Ranch, Chicken, Bacon, Diced Ham 14,99\". Is that a new dish?",
+    "I read \"TWO 2,99\". Is that a new dish?",
+    "I read \"FOUR 5,98\". Is that a new dish?",
+    "I read \"FOUR 9,99\". Is that a new dish?",
+    "I read \"TEN 12,99\". Is that a new dish?",
+    "I read \"Bacon, Red Onions, Green Peppers, 14,99\". Is that a new dish?",
+    "I read \"HALF 5,99\". Is that a new dish?",
+    "I read \"FULL 9,99\". Is that a new dish?",
+    "I read \"12 OZ 11,99\". Is that a new dish?",
+    "I read \"SIX 10,99\". Is that a new dish?",
+    "I read \"Cucumbers, Tomatoes, Black Olives, 6,99\". Is that a new dish?",
+    "I read \"Cheese, Tomatoes, Red Onions 10,99\". Is that a new dish?",
+    "I read \"$19.99 with Italian Dressing 1,99\" but not clearly. Is that right?",
+    "I read \"Olives, Red Onions & House Made 14,99\". Is that a new dish?",
+    "I read \"Frank's Red Hot Sauce, Mozzarella, 14,99\". Is that a new dish?",
+    "\"Lasagna\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Extra Dipping Sauce\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "Mozzarella & Diced Ham",
+     "11,99"
+    ],
+    [
+     "Greenwich Village",
+     "11,99"
+    ],
+    [
+     "Onions, Green Peppers, Mozzarella",
+     "14,99"
+    ],
+    [
+     "FOUR",
+     "5,99"
+    ],
+    [
+     "ies Redion reen epps&",
+     "1,99"
+    ],
+    [
+     "Ranch, Chicken, Bacon, Diced Ham",
+     "14,99"
+    ],
+    [
+     "TWO",
+     "2,99"
+    ],
+    [
+     "FOUR",
+     "5,98"
+    ],
+    [
+     "FOUR",
+     "9,99"
+    ],
+    [
+     "TEN",
+     "12,99"
+    ],
+    [
+     "Bacon, Red Onions, Green Peppers,",
+     "14,99"
+    ],
+    [
+     "Meatball Breadstick",
+     "3,99"
+    ],
+    [
+     "HALF",
+     "5,99"
+    ],
+    [
+     "FULL",
+     "9,99"
+    ],
+    [
+     "12 OZ",
+     "11,99"
+    ],
+    [
+     "SIX",
+     "10,99"
+    ],
+    [
+     "TWELVE",
+     "21,98"
+    ],
+    [
+     "Cucumbers, Tomatoes, Black Olives,",
+     "6,99"
+    ],
+    [
+     "Madison Square Garden",
+     "14,99"
+    ],
+    [
+     "Cheese, Tomatoes, Red Onions",
+     "10,99"
+    ],
+    [
+     "Spaghetti & Meatballs",
+     "16,99"
+    ],
+    [
+     "$19.99 with Italian Dressing",
+     "1,99"
+    ],
+    [
+     "Olives, Red Onions & House Made",
+     "14,99"
+    ],
+    [
+     "Frank's Red Hot Sauce, Mozzarella,",
+     "14,99"
+    ],
+    [
+     "Extra Dressing",
+     "1,29"
+    ],
+    [
+     "Meatballs (3)",
+     "7,99"
+    ]
+   ],
+   "seconds": 2.2
+  },
+  {
+   "photo": "wc113.jpg",
+   "status": "read",
+   "failures": [],
+   "items_read": 6,
+   "labelled": 6,
+   "right_price": 5,
+   "wrong_price": [],
+   "agent": "no_changes",
+   "proposals": [],
+   "questions": [
+    "I read \"(including potatoes and cole slaw) 2,25\". Is that a new dish?",
+    "\"Spaghetti with Salad\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "4 Pc.",
+     "2,25"
+    ],
+    [
+     "9 Pc.",
+     "4,30"
+    ],
+    [
+     "15 Pc.",
+     "6,85"
+    ],
+    [
+     "21 Pc.",
+     "9,50"
+    ],
+    [
+     "(including potatoes and cole slaw)",
+     "2,25"
+    ],
+    [
+     "Spaghetti",
+     "2,60"
+    ]
+   ],
+   "seconds": 0.5
+  },
+  {
+   "photo": "wc137.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "no_prices"
+   ],
+   "items_read": 0,
+   "labelled": 4,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "I found the page but could not read any prices. Please take the photo again, closer and in focus."
+   ],
+   "read": [],
+   "seconds": 0.5
+  },
+  {
+   "photo": "wc145.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 6,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 1.0
+  },
+  {
+   "photo": "wc148.jpg",
+   "status": "retake",
+   "failures": [
+    "no_prices",
+    "no_prices"
+   ],
+   "items_read": 0,
+   "labelled": 6,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "I found the page but could not read any prices. Please take the photo again, closer and in focus."
+   ],
+   "read": [],
+   "seconds": 3.0
+  },
+  {
+   "photo": "wc162.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 6,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.6
+  }
+ ]
+}

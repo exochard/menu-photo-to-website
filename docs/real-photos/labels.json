@@ -1,0 +1,307 @@
+[
+ {
+  "photo": "ov076.jpg",
+  "source": "https://www.flickr.com/photos/76994867@N00/4038872674",
+  "creator": "sidewalk flying",
+  "license": "BY 2.0",
+  "resized": false,
+  "note": "placemat under a coffee cup; prices sit in a column cut by the photo's edge, no name and price pair is fully visible",
+  "items": []
+ },
+ {
+  "photo": "ov116.jpg",
+  "source": "https://www.flickr.com/photos/16491477@N07/6822426049",
+  "creator": "Scotscowgirls",
+  "license": "BY 2.0",
+  "resized": false,
+  "note": "close-up of part of a page; each price sits on its own line under the dish",
+  "items": [
+   [
+    "Bocconcini d'anatra al miele e arancio",
+    "25,80"
+   ],
+   [
+    "Agnello panato alla frutta secca",
+    "25,80"
+   ]
+  ]
+ },
+ {
+  "photo": "ov133.jpg",
+  "source": "https://www.flickr.com/photos/10559879@N00/3427783161",
+  "creator": "avlxyz",
+  "license": "BY-SA 2.0",
+  "resized": false,
+  "note": "open menu shot at an angle; the price sits on the English description line",
+  "items": [
+   [
+    "Calamari Saltati",
+    "19,00"
+   ],
+   [
+    "Svizzera",
+    "12,50"
+   ],
+   [
+    "Pollo dorato",
+    "19,50"
+   ]
+  ]
+ },
+ {
+  "photo": "ov141.jpg",
+  "source": "https://www.flickr.com/photos/70757891@N00/6447341935",
+  "creator": "grongar",
+  "license": "BY 2.0",
+  "resized": false,
+  "note": "handwritten chalkboard in two columns, euro sign after the price",
+  "items": [
+   [
+    "Verduzzo Jaguss",
+    "14,00"
+   ],
+   [
+    "Broy Collavini",
+    "36,00"
+   ],
+   [
+    "Cervaro della Sala",
+    "60,00"
+   ],
+   [
+    "Greco di Tufo",
+    "22,00"
+   ]
+  ]
+ },
+ {
+  "photo": "ov145.jpg",
+  "source": "https://www.flickr.com/photos/11253414@N00/9064258137",
+  "creator": "qcom",
+  "license": "BY-SA 2.0",
+  "resized": false,
+  "note": "framed printed price list in a table, euro sign before the price",
+  "items": [
+   [
+    "Caffè Espresso",
+    "0,80"
+   ],
+   [
+    "Caffè Corretto",
+    "1,20"
+   ],
+   [
+    "Caffè Decaffeinato",
+    "0,90"
+   ],
+   [
+    "Caffè Ginseng",
+    "1,00"
+   ],
+   [
+    "Caffè alla Nocciola",
+    "1,50"
+   ],
+   [
+    "Cappuccino",
+    "1,20"
+   ]
+  ]
+ },
+ {
+  "photo": "wc099.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Brozinni_Pizzeria_-_October_2023_-_Sarah_Stierch_04.jpg",
+  "creator": "Missvain",
+  "license": "CC0",
+  "resized": true,
+  "note": "laminated pizzeria menu in two columns, dollar prices",
+  "items": [
+   [
+    "Meatball Breadstick",
+    "3,99"
+   ],
+   [
+    "Madison Square Garden",
+    "14,99"
+   ],
+   [
+    "Spaghetti & Meatballs",
+    "16,99"
+   ],
+   [
+    "Lasagna",
+    "19,99"
+   ],
+   [
+    "Extra Dipping Sauce",
+    "1,29"
+   ],
+   [
+    "Extra Dressing",
+    "1,29"
+   ]
+  ]
+ },
+ {
+  "photo": "wc113.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Fireside_Pizza_Menu_-_DPLA_-_d11d53752afd42fba6255d1b3b13bb3d_(page_2).jpg",
+  "creator": "unknown",
+  "license": "Public domain",
+  "resized": true,
+  "note": "flat scan of a printed card",
+  "items": [
+   [
+    "4 Pc.",
+    "2,25"
+   ],
+   [
+    "9 Pc.",
+    "4,30"
+   ],
+   [
+    "15 Pc.",
+    "6,85"
+   ],
+   [
+    "21 Pc.",
+    "9,50"
+   ],
+   [
+    "Spaghetti",
+    "2,60"
+   ],
+   [
+    "Spaghetti with Salad",
+    "3,00"
+   ]
+  ]
+ },
+ {
+  "photo": "wc137.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Men%C3%BA_d%27una_pizzeria_del_carrer_de_Baix,_Val%C3%A8ncia.jpg",
+  "creator": "Joanbanjo",
+  "license": "CC BY-SA 4.0",
+  "resized": true,
+  "note": "handwritten chalkboard, prices on their own line for two dishes",
+  "items": [
+   [
+    "Pizza with tomatoe, grilled aubergine, basil and bufala cheese",
+    "13,00"
+   ],
+   [
+    "Grilled cuttlefish",
+    "10,00"
+   ],
+   [
+    "Grilled king prawn",
+    "15,00"
+   ],
+   [
+    "Grilled octopus with potato and salad",
+    "18,00"
+   ]
+  ]
+ },
+ {
+  "photo": "wc145.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Quebec_pizzeria_menu.jpg",
+  "creator": "StevenBjerke97",
+  "license": "CC BY-SA 4.0",
+  "resized": true,
+  "note": "flat scan of a bilingual flyer; each line ends with the English name after the price",
+  "items": [
+   [
+    "Sauce tomates",
+    "8,95"
+   ],
+   [
+    "Sauce à la viande",
+    "9,95"
+   ],
+   [
+    "Boulettes",
+    "10,95"
+   ],
+   [
+    "Viande fumée",
+    "10,95"
+   ],
+   [
+    "Pepperoni",
+    "10,95"
+   ],
+   [
+    "Saucisse Italienne",
+    "10,95"
+   ]
+  ]
+ },
+ {
+  "photo": "wc148.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Della_Santina%27s_Trattoria_-_February_2025_-_Sarah_Stierch_01.jpg",
+  "creator": "Missvain",
+  "license": "CC0",
+  "resized": true,
+  "note": "menu photographed sideways (rotated 90 degrees); prices inline at the end of each description",
+  "items": [
+   [
+    "Insalata di granchio",
+    "26,95"
+   ],
+   [
+    "Polenta alla griglia",
+    "18,95"
+   ],
+   [
+    "Insalata di pomodori con acciughe bianchi",
+    "19,95"
+   ],
+   [
+    "Insalata di pollo",
+    "24,95"
+   ],
+   [
+    "Panino del giorno",
+    "24,95"
+   ],
+   [
+    "Cacciatore di coniglio",
+    "39,95"
+   ]
+  ]
+ },
+ {
+  "photo": "wc162.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:2016-07-05_osteria_la_Chitarra,_Napoli.jpg",
+  "creator": "Nemo bis",
+  "license": "CC BY-SA 3.0",
+  "resized": true,
+  "note": "open Italian menu book, euro sign before the price, some prices on the description line",
+  "items": [
+   [
+    "Antipasto della chitarra",
+    "10,00"
+   ],
+   [
+    "Linguine alla cetarese",
+    "7,00"
+   ],
+   [
+    "Zuppa di fagioli alla maruzzara",
+    "7,00"
+   ],
+   [
+    "Fusilli di pasta fresca",
+    "7,00"
+   ],
+   [
+    "Risotto alla napoletana",
+    "7,00"
+   ],
+   [
+    "Gamberoni al vino bianco",
+    "12,00"
+   ]
+  ]
+ }
+]

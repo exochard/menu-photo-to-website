@@ -38,6 +38,16 @@ The menus include accents and "€" ("ragù", "lunedì", "12,50 €"). The first
 the OpenCV Zoo CRNN, read 64%, 59% and 29% of items on the first three conditions and made
 11 wrong proposals on the harder three. Each change the agent does not propose becomes a
 question to the owner; the trace on the demo page shows every step and why it was taken.
+## Results on real photos (21 found online, open licences)
+
+The synthetic table above is the system at its best. Real menu photos were labelled by hand
+before any code ran on them: 11 used to find and fix failures (`docs/real-photos/`), 10 held
+out (`docs/real-photos-heldout/`). On the held-out photos the agent read 13 of 44 labelled
+dishes with the right price, asked for a new photo on 4 of 10, and proposed no wrong price;
+its 17 "new dish" proposals were all real dishes, 2 with garbled names. The fix for
+two-column menus took the tuning set from 6 to 15 of 49 dishes right and from 9 wrong
+proposals to 2. `eval_real.py` reproduces both.
+
 Details, baselines and failures: `docs/REPORT.md`;
 result files: `docs/results/`.
 
@@ -50,6 +60,8 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python webapp.py           # http://localhost:8080
 .venv/bin/python eval.py --n 30      # reading
 .venv/bin/python eval_agent.py --n 30 [--no-reread] [--first-seed 0]
+.venv/bin/python eval_real.py        # real photos, tuning set
+.venv/bin/python eval_real.py --dir docs/real-photos-heldout --out docs/results/eval-real-heldout.json
 ./deploy.sh                          # AWS Lambda + Function URL, after `aws login`
 ./deploy.sh --down                   # remove it
 ```

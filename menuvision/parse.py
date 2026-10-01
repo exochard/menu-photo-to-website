@@ -2,9 +2,9 @@
 import re
 from dataclasses import dataclass, field
 
-# A price at the end of a line, optionally followed by the euro sign. Under heavy blur the
-# sign can still come back as a stray "6", "C", "E" or "e" after the price.
-PRICE = re.compile(r"^(?P<name>.*?)\s*(?:€\s*)?(?P<price>\d{1,3}[.,]\d{2})(?:\s*(?:€|[6CEce]))?$")
+# A price at the end of a line, with a euro or dollar sign before or after it. Under heavy
+# blur the sign can still come back as a stray "6", "C", "E" or "e" after the price.
+PRICE = re.compile(r"^(?P<name>.*?)(?:(?:\s*[.·…_]){3,})?\s*(?:[€$]\s*)?(?P<price>\d{1,3}[.,]\d{2})(?:\s*(?:[€$]|[6CEce]))?$")
 TIME_RANGE = re.compile(r"(\d{1,2})[:.](\d{2})\s*[-–]?\s*(\d{1,2})[:.](\d{2})")
 CLOSED = re.compile(r"\bchius[oa]\b", re.I)
 
@@ -31,18 +31,26 @@ class Menu:
 
 def parse(lines: list[str]) -> Menu:
     menu = Menu()
+    # The last line kept as a section heading or a note, with the list that holds it. A line
+    # that is only a price right after it is the price of that dish, printed below its name.
+    above: tuple[str, list] | None = None
     for raw in lines:
         text = re.sub(r"\s+", " ", raw).strip()
         if not text:
             continue
+        unpriced, above = above, None
         m = PRICE.match(text)
-        if m and not m.group("name"):
-            menu.notes.append(text)  # a price with no name: leave it for review
-            continue
         if m:
+            name = m.group("name")
+            if not name:
+                if unpriced is None:
+                    menu.notes.append(text)  # a price with no name: leave it for review
+                    continue
+                name = unpriced[0]
+                unpriced[1].pop()
             if not menu.sections:
                 menu.sections.append(Section(""))
-            menu.sections[-1].items.append(Item(m.group("name"), m.group("price").replace(".", ",")))
+            menu.sections[-1].items.append(Item(name, m.group("price").replace(".", ",")))
             continue
         ranges = TIME_RANGE.findall(text)
         if ranges:
@@ -54,6 +62,8 @@ def parse(lines: list[str]) -> Menu:
             menu.title = text
         elif len(text.split()) <= 3:
             menu.sections.append(Section(text))
+            above = (text, menu.sections)
         else:
             menu.notes.append(text)
+            above = (text, menu.notes)
     return menu

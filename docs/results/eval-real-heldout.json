@@ -1,0 +1,461 @@
+{
+ "photos": 10,
+ "labelled": 44,
+ "right_price": 13,
+ "wrong_price": 0,
+ "retakes": 4,
+ "price_changes": 0,
+ "new_dish_proposals": 17,
+ "questions": 21,
+ "rows": [
+  {
+   "photo": "ho008.jpg",
+   "status": "retake",
+   "failures": [
+    "cut",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 6,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.9
+  },
+  {
+   "photo": "ho013.jpg",
+   "status": "read",
+   "failures": [
+    "cut"
+   ],
+   "items_read": 1,
+   "labelled": 4,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "no_changes",
+   "proposals": [],
+   "questions": [
+    "I read \"Eabersametorhe 2,50\" but not clearly. Is that right?",
+    "\"Gourmet Apfeltorte\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Erdbeersahnetorte\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Käse-Mandarinen Torte\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Latte Macchiato Torte\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "Eabersametorhe",
+     "2,50"
+    ]
+   ],
+   "seconds": 0.8
+  },
+  {
+   "photo": "ho016.jpg",
+   "status": "read",
+   "failures": [
+    "no_page"
+   ],
+   "items_read": 2,
+   "labelled": 2,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "no_changes",
+   "proposals": [],
+   "questions": [
+    "I read \"Schninel 12,80\" but not clearly. Is that right?",
+    "\"m. Schnitzel\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "Schninel",
+     "12,80"
+    ],
+    [
+     "Wildachs",
+     "14,80"
+    ]
+   ],
+   "seconds": 0.6
+  },
+  {
+   "photo": "ho017.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 6,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.8
+  },
+  {
+   "photo": "ho022.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "no_prices"
+   ],
+   "items_read": 0,
+   "labelled": 0,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "I found the page but could not read any prices. Please take the photo again, closer and in focus."
+   ],
+   "read": [],
+   "seconds": 0.6
+  },
+  {
+   "photo": "ho034.jpg",
+   "status": "read",
+   "failures": [],
+   "items_read": 11,
+   "labelled": 6,
+   "right_price": 3,
+   "wrong_price": [],
+   "agent": "proposals",
+   "proposals": [
+    [
+     "new_item",
+     "MINESTRONE",
+     null,
+     "5,50"
+    ],
+    [
+     "new_item",
+     "SALSICCE",
+     null,
+     "8,00"
+    ],
+    [
+     "new_item",
+     "GULASCH",
+     null,
+     "10,00"
+    ],
+    [
+     "new_item",
+     "BISTECCA DI MANZO",
+     null,
+     "8,00"
+    ],
+    [
+     "new_item",
+     "BRACIOLA DI MAIALE",
+     null,
+     "7,00"
+    ],
+    [
+     "new_item",
+     "WURSTEL CON PATATE",
+     null,
+     "8,00"
+    ]
+   ],
+   "questions": [
+    "I read \"CAPRIOLO 13,00\" but not clearly. Is that right?",
+    "I read \"FORMAGGIO FUSO 8,00\" but not clearly. Is that right?",
+    "\"Canederli\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Penne ai funghi\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"Lasagne al forno\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "GNOCCHI DI PATATE",
+     "7,00"
+    ],
+    [
+     "SPAGHETTI",
+     "6,00"
+    ],
+    [
+     "ZUPPA D'ORZO",
+     "5,50"
+    ],
+    [
+     "MINESTRONE",
+     "5,50"
+    ],
+    [
+     "CAPRIOLO",
+     "13,00"
+    ],
+    [
+     "SALSICCE",
+     "8,00"
+    ],
+    [
+     "GULASCH",
+     "10,00"
+    ],
+    [
+     "FORMAGGIO FUSO",
+     "8,00"
+    ],
+    [
+     "BISTECCA DI MANZO",
+     "8,00"
+    ],
+    [
+     "BRACIOLA DI MAIALE",
+     "7,00"
+    ],
+    [
+     "WURSTEL CON PATATE",
+     "8,00"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  {
+   "photo": "ho045.jpg",
+   "status": "retake",
+   "failures": [
+    "no_page",
+    "cut"
+   ],
+   "items_read": 0,
+   "labelled": 5,
+   "right_price": 0,
+   "wrong_price": [],
+   "agent": "retake",
+   "proposals": [],
+   "questions": [
+    "Part of the menu is outside the photo or hidden. Please take it again with the whole sheet in the frame."
+   ],
+   "read": [],
+   "seconds": 0.4
+  },
+  {
+   "photo": "ho088.jpg",
+   "status": "read",
+   "failures": [
+    "no_page"
+   ],
+   "items_read": 1,
+   "labelled": 3,
+   "right_price": 1,
+   "wrong_price": [],
+   "agent": "no_changes",
+   "proposals": [],
+   "questions": [
+    "\"2 scoops\" is on the site but I did not find it in the photo. Is it still on the menu?",
+    "\"3 scoops\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "1scoop",
+     "2,20"
+    ]
+   ],
+   "seconds": 0.5
+  },
+  {
+   "photo": "ho206.jpg",
+   "status": "read",
+   "failures": [
+    "no_page"
+   ],
+   "items_read": 5,
+   "labelled": 6,
+   "right_price": 4,
+   "wrong_price": [],
+   "agent": "no_changes",
+   "proposals": [],
+   "questions": [
+    "\"Chocolate Stout\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "CUVEE DE RANKE",
+     "4,50"
+    ],
+    [
+     "FEUFOUNE",
+     "5,50"
+    ],
+    [
+     "MAMOUCHE",
+     "5,50"
+    ],
+    [
+     "CUVEE ST.GillOiSE",
+     "5,50"
+    ],
+    [
+     "KRiEK DE RANKE",
+     "4,50"
+    ]
+   ],
+   "seconds": 0.6
+  },
+  {
+   "photo": "ho211.jpg",
+   "status": "read",
+   "failures": [],
+   "items_read": 17,
+   "labelled": 6,
+   "right_price": 5,
+   "wrong_price": [],
+   "agent": "proposals",
+   "proposals": [
+    [
+     "new_item",
+     "Maneblusser",
+     null,
+     "2,50"
+    ],
+    [
+     "new_item",
+     "Lucifer",
+     null,
+     "2,80"
+    ],
+    [
+     "new_item",
+     "Gouden Carolus lasi",
+     null,
+     "3,20"
+    ],
+    [
+     "new_item",
+     "Gouden Carolus Ambri",
+     null,
+     "3,20"
+    ],
+    [
+     "new_item",
+     "Maneblusser",
+     null,
+     "3,20"
+    ],
+    [
+     "new_item",
+     "Lucifer",
+     null,
+     "3,20"
+    ],
+    [
+     "new_item",
+     "Gouden Carolus Classic.",
+     null,
+     "8,50"
+    ],
+    [
+     "new_item",
+     "Gouden Carolus Tripel",
+     null,
+     "8,50"
+    ],
+    [
+     "new_item",
+     "Gouden Carolus Ambrio",
+     null,
+     "8,50"
+    ],
+    [
+     "new_item",
+     "Lucifer",
+     null,
+     "8,50"
+    ],
+    [
+     "new_item",
+     "Portie salamie",
+     null,
+     "4,50"
+    ]
+   ],
+   "questions": [
+    "I read \"Anker pis0 Gouden Carolus Classic 2,80\" but not clearly. Is that right?",
+    "\"Anker pils\" is on the site but I did not find it in the photo. Is it still on the menu?"
+   ],
+   "read": [
+    [
+     "Anker pis0 Gouden Carolus Classic",
+     "2,80"
+    ],
+    [
+     "Maneblusser",
+     "2,50"
+    ],
+    [
+     "Lucifer",
+     "2,80"
+    ],
+    [
+     "Gouden Carolus lasi",
+     "3,20"
+    ],
+    [
+     "Gouden Carolus Ambri",
+     "3,20"
+    ],
+    [
+     "Maneblusser",
+     "3,20"
+    ],
+    [
+     "Lucifer",
+     "3,20"
+    ],
+    [
+     "Boscoulis.",
+     "3,20"
+    ],
+    [
+     "Gouden Carolus Classic.",
+     "8,50"
+    ],
+    [
+     "Gouden Carolus Tripel",
+     "8,50"
+    ],
+    [
+     "Gouden Carolus Ambrio",
+     "8,50"
+    ],
+    [
+     "Lucifer",
+     "8,50"
+    ],
+    [
+     "Cuvée van de Keizer rood",
+     "11,50"
+    ],
+    [
+     "Cuvée van de Keizer blauw",
+     "12,50"
+    ],
+    [
+     "Assortiment Belgische kazen",
+     "12,50"
+    ],
+    [
+     "Portie Brouwerskaas",
+     "6,50"
+    ],
+    [
+     "Portie salamie",
+     "4,50"
+    ]
+   ],
+   "seconds": 2.1
+  }
+ ]
+}

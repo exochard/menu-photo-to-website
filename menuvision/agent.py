@@ -63,12 +63,15 @@ def sharpen(image: np.ndarray, amount: float = 1.5) -> np.ndarray:
 
 
 def merge_reads(first: list[Line], second: list[Line], low: float = LOW) -> tuple[list[Line], int]:
-    """Keep each confident line; for a weak one take the likelier reading of the same row."""
+    """Keep each confident line; for a weak one take the likelier reading of the same cell."""
     merged, replaced = [], 0
     for line in first:
         best = line
         if line.confidence < low:
-            same_row = [other for other in second if abs(other.y - line.y) < 12]
+            # A row of two columns is two lines: the other column's line is not a rereading.
+            same_row = [other for other in second if abs(other.y - line.y) < 12
+                        and min(line.x1, other.x1) - max(line.x0, other.x0)
+                        >= 0.5 * max(line.x1 - line.x0, other.x1 - other.x0)]
             best = max([line, *same_row], key=lambda candidate: candidate.confidence)
         replaced += best is not line
         merged.append(best)
@@ -84,6 +87,19 @@ def key(name: str) -> str:
 def price_of(text: str) -> str:
     match = re.search(r"\d{1,3}[.,]\d{2}", text or "")
     return match.group().replace(".", ",") if match else ""
+
+
+def fragment(name: str) -> bool:
+    """A name that is more likely a piece of a description or a size ("FOUR", "12 OZ") than a dish.
+
+    An ingredient list has commas, a wrapped line starts in lower case or inside a bracket,
+    a cut phrase ends on a connector and a size is one short word. A new dish read that
+    way is asked about, never proposed.
+    """
+    name = name.strip()
+    words = re.findall(r"[^\W\d_]+", name)
+    return ("," in name or name[:1].islower() or name[:1] in "(&" or name[-1:] in "&-•"
+            or (len(words) <= 1 and max(map(len, words), default=0) < 5))
 
 
 def menu_section(cfg: dict[str, Any]) -> dict[str, Any] | None:
@@ -116,6 +132,9 @@ def diff(section: dict[str, Any], read: list[tuple[str, str, str, float]],
                             if len(key(name)) >= 4 and key(name) in k), None)
             if part_of:
                 questions.append(f'I read "{name} {price}". Is that "{part_of}"?')
+                continue
+            if fragment(name):
+                questions.append(f'I read "{name} {price}". Is that a new dish?')
                 continue
         if confidence < low:
             questions.append(f'I read "{name} {price}" but not clearly. Is that right?')
@@ -192,6 +211,8 @@ def read_page(photo: np.ndarray, reader: Reader, joined: bool, trace: list[dict[
         trace.append({"tool": "reread_region", "preprocess": "unsharp", "lines_replaced": replaced,
                       "still_low": sum(line.confidence < low for line in lines)})
     menu = parse([line.text for line in lines])
+    # An item that parse built from two lines (a price printed under its dish) has no line to
+    # take a confidence from, so it scores 0 and is only ever asked about.
     confidence = {}
     for line in lines:
         match = PRICE.match(re.sub(r"\s+", " ", line.text).strip())

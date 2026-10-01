@@ -4,11 +4,14 @@ PP-OCRv3 DB (cv.dnn.TextDetectionModel_DB) finds text phrases, and the PP-OCRv5 
 recogniser (cv.dnn) reads each phrase whole. Its alphabet covers Italian accents and "€",
 so "ragù", "lunedì" and "12,50 €" come back as printed.
 """
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import cv2 as cv
 import numpy as np
+
+from menuvision.parse import PRICE
 
 MODELS = Path(__file__).resolve().parent.parent / "models"
 DETECTOR = MODELS / "text_detection_en_ppocrv3_2023may.onnx"
@@ -42,6 +45,14 @@ class Line:
     @property
     def confidence(self) -> float:
         return min((w.confidence for w in self.words), default=0.0)
+
+    @property
+    def x0(self) -> int:
+        return self.words[0].x0
+
+    @property
+    def x1(self) -> int:
+        return self.words[-1].x1
 
 
 def ctc_decode(logprobs: np.ndarray) -> tuple[str, float]:
@@ -173,21 +184,108 @@ def text_slope(boxes: list[np.ndarray]) -> float:
     return float(np.median(slopes)) if slopes else 0.0
 
 
-def group_lines(words: list[tuple[int, int, Word]], overlap: float = 0.5) -> list[Line]:
-    """Rows of words, joined when their boxes share at least `overlap` of the shorter height.
+# A price, with its currency sign and a stray sign the blur can leave after it. Not a time
+# ("12.30-15.00") and not part of a longer number.
+PRICE_AT = re.compile(r"(?<![\d.,:\-–])(?:[€$]\s*)?\d{1,3}[.,]\d{2}(?:\s*[€$])?(?:\s+[6CEce](?=\s|$))?"
+                      r"(?![\d]|[.,]\d|\s*[-–:]\s*\d)")
+# The start of a cell: a word of three letters after a bullet or a bracket at most, so a
+# trailing mark such as "(v)" or a second price stays with its item.
+OPENS_CELL = re.compile(r"\s*[^\w\s]{0,2}([^\W\d_])[^\W\d_]{2,}")
+
+
+def opens_cell(rest: str, priced: bool) -> bool:
+    """Whether the text after a price starts another column's cell and not a note on the dish.
+
+    With a price of its own it does; without one only a capital marks a dish name
+    ("Pineapple & Mozzarella"), where "con rucola" or "(vegan)" trails the price.
+    """
+    match = OPENS_CELL.match(rest)
+    return match is not None and (priced or match.group(1).isupper())
+
+
+def is_lone_price(text: str) -> bool:
+    match = PRICE.match(text.strip())
+    return text.strip() in ("€", "$") or bool(match and not match.group("name"))
+
+
+def ends_with_price(text: str) -> bool:
+    last = None
+    for last in PRICE_AT.finditer(text):
+        pass
+    return last is not None and last.end() == len(text.rstrip())
+
+
+def split_at_prices(y0: int, y1: int, word: Word) -> list[tuple[int, int, Word]]:
+    """Cut a recognised box where a price is followed by the start of another cell.
+
+    A box can span two columns ("€ 0,80 Fanta lt.33 € 1,00") when the gap between them is
+    as small as the one between a dish and its price. The left part of the box keeps its
+    share of the width, by characters.
+    """
+    text, cuts = word.text, []
+    for m in PRICE_AT.finditer(text):
+        rest = text[m.end():]
+        if opens_cell(rest, PRICE_AT.search(rest) is not None):
+            cuts.append(m.end())
+    if not cuts:
+        return [(y0, y1, word)]
+    pieces, start = [], 0
+    for end in [*cuts, len(text)]:
+        part = text[start:end].strip()
+        pieces.append((part, word.x0 + round((word.x1 - word.x0) * start / len(text)),
+                       word.x0 + round((word.x1 - word.x0) * end / len(text))))
+        start = end
+    return [(y0, y1, Word(a, b, part, word.confidence)) for part, a, b in pieces if part]
+
+
+def split_row(members: list[tuple[int, int, Word]], gutter: float) -> list[Line]:
+    """One row of words as the cells it holds, one Line each, left to right.
+
+    A new cell starts where the row jumps a `gutter` of text heights, and after a price
+    when the next column's cell follows it (a dish and its price, then the next dish). A lone
+    price stays with the cell to its left however far away: a price at the right margin
+    belongs to its dish. A row that starts with a price is not cut after it: its price
+    belongs to the text that follows.
+    """
+    parts = [piece for m in members for piece in split_at_prices(*m)]
+    parts.sort(key=lambda t: t[2].x0)
+    cells: list[list[tuple[int, int, Word]]] = []
+    for i, part in enumerate(parts):
+        y0, y1, word = part
+        if cells and not is_lone_price(word.text) and not all(is_lone_price(t[2].text) for t in cells[-1]):
+            py0, py1, prev = cells[-1][-1]
+            after_price = (ends_with_price(prev.text)
+                           and opens_cell(word.text, any(PRICE_AT.search(p[2].text) for p in parts[i:])))
+            wide = word.x0 - prev.x1 >= gutter * min(y1 - y0, py1 - py0)
+            if after_price or wide:
+                cells.append([part])
+                continue
+        if cells:
+            cells[-1].append(part)
+        else:
+            cells.append([part])
+    lines = []
+    for cell in cells:
+        top = min(cell, key=lambda t: t[0] + t[1])
+        lines.append(Line((top[0] + top[1]) / 2, [t[2] for t in cell],
+                          min(t[0] for t in cell), max(t[1] for t in cell)))
+    return lines
+
+
+def group_lines(words: list[tuple[int, int, Word]], overlap: float = 0.5,
+                gutter: float = 2.0) -> list[Line]:
+    """Rows of words, joined when their boxes share at least `overlap` of the shorter height,
+    then cut into the cells of a multi-column row (`split_row`).
 
     Overlap, not a fixed pixel tolerance: on a page flattened from a tilted photo the price
     at the right margin can sit a third of a line lower than its dish name.
     """
-    rows: list[tuple[int, int, Line]] = []
+    rows: list[tuple[int, int, list[tuple[int, int, Word]]]] = []
     for y0, y1, word in sorted(words, key=lambda t: t[0] + t[1]):
         if rows:
-            r0, r1, line = rows[-1]
+            r0, r1, members = rows[-1]
             if min(y1, r1) - max(y0, r0) >= overlap * min(y1 - y0, r1 - r0):
-                line.words.append(word)
-                line.y0, line.y1 = min(line.y0, y0), max(line.y1, y1)
+                members.append((y0, y1, word))
                 continue
-        rows.append((y0, y1, Line((y0 + y1) / 2, [word], y0, y1)))
-    for _, _, line in rows:
-        line.words.sort(key=lambda w: w.x0)
-    return [line for _, _, line in rows]
+        rows.append((y0, y1, [(y0, y1, word)]))
+    return [line for _, _, members in rows for line in split_row(members, gutter)]

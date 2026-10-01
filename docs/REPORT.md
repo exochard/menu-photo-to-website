@@ -1,7 +1,7 @@
 # Menu photo to website: technical report
 
 OpenCV AI Competition 2026, Agentic Vision. Team exochard (Giuseppe Castelluccio), report of
-2026-09-29. Every number below comes from a script in this repository and says which one.
+2026-10-01. Every number below comes from a script in this repository and says which one.
 
 - Live demo: https://rdnkmfzkqy6xfzvguayc3sneva0igvic.lambda-url.eu-central-1.on.aws/ (a
   synthetic menu and site are preloaded; "Upload your own" reads any photo)
@@ -168,10 +168,73 @@ with no wrong proposal before or after.
   item lines and 6% of correctly read ones. A misread the recogniser is sure of can pass as
   a proposal; the owner's approval step is the guard for those.
 
+### Real photos found online
+
+Synthetic menus cannot show how the system meets a real one. So 21 real menu photos with
+open licences were added, in two sets, each labelled by hand before any code ran on it:
+up to six (name, price) pairs per photo, written down from the photo. Credits and selection
+rules are in each folder's README.
+
+- `docs/real-photos/` (11 photos, 49 pairs): the first look at real menus, then used to
+  tune the fixes below. Its "after" numbers are therefore optimistic.
+- `docs/real-photos-heldout/` (10 photos, 44 pairs, German, Spanish, Portuguese, Belgian
+  and Italian menus): kept away from that work and run once on the old code and once on the
+  new one, with nothing changed between or after.
+
+`eval_real.py` runs the agent's own read step, then the full agent against a site whose
+menu holds the labelled dishes at their labelled prices. A price change on a labelled dish
+would always be wrong; a "new dish" proposal can be an unlabelled dish read correctly, so
+those were checked by hand against the photo.
+
+| | Tuning set, before | Tuning set, after | Held-out, before | Held-out, after |
+|---|---:|---:|---:|---:|
+| Labelled pairs read with the right price | 6/49 | 15/49 | 12/44 | 13/44 |
+| Labelled pairs read with a wrong price | 6 | 0 | 0 | 0 |
+| Wrong price changes proposed | 0 | 0 | 0 | 0 |
+| "New dish" proposals: right / wrong name / wrong | 1 / 1 / 9 | 11 / 1 / 2 | 15 / 2 / 0 | 15 / 2 / 0 |
+| Photos ending in a retake request | 7/11 | 7/11 | 5/10 | 4/10 |
+
+What changed (`menuvision/ocr.py`, `parse.py`, `agent.py`, with unit tests):
+
+- **Columns.** The first look found one failure behind 9 of the 11 "new dish" proposals: on
+  a two-column menu, a row ran across both columns and the left-hand dish took the
+  right-hand price ("Latte Bianco € 0,80 Birra Peroni cl.66" at 1,80). Rows are now cut
+  into cells. A cell closes after a price when another column's text follows, or at a gap
+  of two text heights; a lone price stays with the text on its left, so a dotted leader or
+  a right-margin price is still one line. A weak cell is re-read only against the same
+  cell, never against the other column.
+- **Prices under the dish.** A line that is only a price becomes the price of the unpriced
+  line above it, with confidence 0, so the agent only ever asks about it.
+- **Fragments.** A "new dish" whose name looks like a piece of a description or a size (a
+  comma, a lower-case start, a trailing "&", one short word) becomes a question.
+- **Dollar prices and dotted leaders** are read.
+
+On the framed price list (`ov145`) the agent went from 1 to 6 of 6 pairs right, with its 5
+wrong prices gone, and its 10 "new dish" proposals are the right dishes at the right prices
+(one name cut short, "BECK'S cl.3"). On the held-out set, which has only one two-column
+menu, the gain is small: one more pair right and one fewer retake. That is the honest size
+of the improvement on unseen photos. The synthetic results are unchanged in every
+condition (`eval.py` and `eval_agent.py` on the evaluation seeds give the same tables).
+
+What remains:
+
+- Two wrong "new dish" proposals on the tuning set (`wc099`): a description line that
+  carries the dish's price ("Mozzarella & Diced Ham", 11,99) and a size label ("TWELVE",
+  21,98). Both reach the owner as proposals with that name, to approve or reject.
+- Half of all real photos still end in a retake request: an open menu book or a card cut
+  by the frame (the edge check fires on lines that really are cut), a photo taken sideways,
+  handwriting. A looser edge check was tried and dropped, because it turned a cut placemat
+  into a wrong proposal.
+- Prices on the description line under the dish name are not read; no rule was found that
+  picks the dish line without adding wrong names.
+- Questions grow with the menu: 43 on the 60-line price list, most of them low-confidence
+  lines held back from proposals.
+
 ## Limitations
 
-- The evaluation is synthetic. Real menus have handwriting, chalkboards, two columns,
-  decorative fonts and photos on laminated card; none of those is measured here.
+- On real photos the agent reads printed menus in one or two columns and asks for a new
+  photo on about half of the rest (above). Handwriting, sideways photos, open menu books
+  and prices on the description line are not handled.
 - A sheet that runs out of the frame is read when all of its text is inside. When the
   frame cuts the text, the agent asks for a new photo; it does not read a partial menu.
 - Hours are compared as time ranges only. The owner decides which days change.
@@ -206,10 +269,12 @@ it, and the failures are reported with the successes.
 ```
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
 ./fetch_models.sh
-.venv/bin/python -m pytest -q                    # 22 tests
+.venv/bin/python -m pytest -q                    # 36 tests
 .venv/bin/python eval.py --n 30                  # reading table
 .venv/bin/python eval_agent.py --n 30            # agent table
 .venv/bin/python eval_agent.py --n 30 --no-reread
+.venv/bin/python eval_real.py                    # 11 real photos (tuning set)
+.venv/bin/python eval_real.py --dir docs/real-photos-heldout --out docs/results/eval-real-heldout.json
 .venv/bin/python webapp.py                       # http://localhost:8080
 ./deploy.sh                                      # AWS, after `aws login`
 ```
